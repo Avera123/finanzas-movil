@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0+4 — Etapa 3 — 2026-11-04
+
+- Deudas en cinco modos, interés implícito, abonos, cuotas abiertas y aplazamientos.
+- Préstamos por cobrar, vencimientos, cobros parciales y reversión.
+- Proyección de deuda a 12 meses y presupuesto de plazo mínimo.
+- 13 casos de referencia ejecutados desde el motor JS; 105 pruebas locales aprobadas.
+
+
 ## 0.3.0+3 — Etapa 2 — 2026-11-04
 
 - Gastos y repeticiones, pagar/deshacer, eliminar con reversión, asignar cuenta y mover mes/serie.
