@@ -8,6 +8,8 @@ import 'domain/month_summary.dart';
 import 'domain/annual_projection.dart';
 import '../plans/domain/plan_engine.dart';
 import '../movements/domain/finance_commands.dart';
+import '../movements/presentation/operation_form.dart';
+import '../movements/presentation/operation_screen.dart';
 
 class AnnualScreen extends ConsumerStatefulWidget {
   const AnnualScreen({super.key, this.today});
@@ -21,6 +23,30 @@ class _AnnualScreenState extends ConsumerState<AnnualScreen> {
   late String from = addMonth(now, -5);
   String? selected;
   final horizontal = ScrollController();
+
+  Future<void> editIncome(DashboardSnapshot snapshot, String month) async {
+    final original = (snapshot.document.fields['inc'] as Map?)?[month];
+    final result =
+        await Navigator.of(context).push<Map<String, String>>(MaterialPageRoute(
+            builder: (_) => OperationForm(title: 'Ingreso de $month', fields: [
+                  InputSpec(
+                      'value', 'Ingreso COP; vacío vuelve al salario × tasa',
+                      initial: original?.toString() ?? '',
+                      numeric: true,
+                      required: false)
+                ])));
+    if (!mounted || result == null) return;
+    final text = result['value']!.trim();
+    final value = text.isEmpty
+        ? null
+        : double.tryParse(text.replaceAll(',', '.')) ?? double.nan;
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => OperationScreen(
+            document: snapshot.document,
+            title: 'Revisar ingreso de $month',
+            prepare: (c) => c.setIncome(month, value))));
+  }
+
   @override
   void dispose() {
     horizontal.dispose();
@@ -124,6 +150,9 @@ class _AnnualScreenState extends ConsumerState<AnnualScreen> {
                       children: [
                         Text('Detalle de $selected',
                             style: Theme.of(context).textTheme.titleLarge),
+                        OutlinedButton(
+                            onPressed: () => editIncome(snapshot, selected!),
+                            child: const Text('Editar ingreso del mes')),
                         Text(
                             'A favor / en contra: ${cop(pick['left']!)}\nGasto base estimado incluido: ${cop(pick['estimated']!)}'),
                         if (!records(data, 'exp')

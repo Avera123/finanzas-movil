@@ -38,6 +38,17 @@ void main() {
       await tester.scrollUntilVisible(find.text('Detalle de 2026-11'), 150,
           scrollable: find.byType(Scrollable).first);
       expect(tester.takeException(), isNull);
+      final edit =
+          find.widgetWithText(OutlinedButton, 'Editar ingreso del mes');
+      await tester.scrollUntilVisible(edit.hitTestable(), 100,
+          scrollable: find.byType(Scrollable).first);
+      await tester.tap(edit);
+      await tester.pumpAndSettle();
+      expect(find.text('Ingreso de 2026-11'), findsOneWidget);
+      await tester.enterText(find.byType(TextFormField), '0');
+      await tester.tap(find.text('Cancelar'));
+      await tester.pumpAndSettle();
+      expect((snapshot.document.fields['inc'] as Map)['2026-11'], isNull);
       await tester.scrollUntilVisible(find.byType(DataTable), 200,
           scrollable: find.byType(Scrollable).first);
       expect(find.text('Total flujos'), findsOneWidget);
