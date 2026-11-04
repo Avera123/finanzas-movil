@@ -15,3 +15,9 @@ coverage/
 android/local.properties
 ios/Flutter/Generated.xcconfig
 ios/Flutter/flutter_export_environment.sh
+*.jks
+*.keystore
+android/key.properties
+*.p12
+*.mobileprovision
+validation/*.log
