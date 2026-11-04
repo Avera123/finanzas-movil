@@ -1,3 +1,5 @@
+Estado actual 0.3.0: FinanceDraft conserva el documento completo; FinancialSave controla confirmación/concurrencia/resultado incierto; FinanceCommands aplica cambios puros; OperationForm y OperationScreen separan edición y confirmación. Ver [validación de etapa 2](PHASE2_VALIDATION.md). El cuerpo siguiente conserva el diseño inicial de Fase 0.
+
 # Arquitectura — Fase 0
 
 ## Alcance real

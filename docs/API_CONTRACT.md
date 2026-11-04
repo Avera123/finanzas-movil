@@ -1,3 +1,5 @@
+Estado actual 0.3.0: PUT /api/state implementado con confirmación y versión; ver [validación de etapa 2](PHASE2_VALIDATION.md). Las referencias a cliente de solo lectura más abajo describen la auditoría original de Fase 0.
+
 # Contrato de la API existente (multiusuario)
 
 Revalidado por lectura del código de `Avera123/finanzas-backend`, rama `master`, el 3 de noviembre de 2026. No se modificó el backend ni se accedió directamente a PostgreSQL.

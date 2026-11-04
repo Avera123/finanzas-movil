@@ -27,12 +27,17 @@ String cop(num value) {
 
 class ExpenseView {
   ExpenseView(Map row)
-      : name = row['name'] as String,
+      : id = row['id'] as String?,
+        linkedPlan = row['debtId'] != null || row['investId'] != null,
+        series = row['seriesId'] != null,
+        name = row['name'] as String,
         category = row['cat'] as String,
         amount = (row['amt'] as num).toDouble(),
         paid = row['paid'] as bool,
         accountId = row['acc'] as String?;
   final String name, category;
+  final String? id;
+  final bool linkedPlan, series;
   final double amount;
   final bool paid;
   final String? accountId;

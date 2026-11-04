@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/finance_state.dart';
 import '../models/finance_document.dart';
+import 'financial_save.dart';
 import '../models/user_profile.dart';
 
 const backendUrl = String.fromEnvironment('API_BASE_URL');
@@ -56,7 +57,7 @@ class SecureSessionStore implements SessionStore {
   }
 }
 
-class BackendClient {
+class BackendClient implements FinancialGateway {
   BackendClient(
       {Dio? dio,
       SessionStore? store,
@@ -80,6 +81,7 @@ class BackendClient {
   final String _baseUrl;
   final DateTime Function() _now;
   int _sessionGeneration = 0;
+  @override
   int get sessionGeneration => _sessionGeneration;
   void _checkUrl() {
     final uri = Uri.tryParse(_baseUrl);
@@ -153,6 +155,7 @@ class BackendClient {
     return (await readDocument()).summary;
   }
 
+  @override
   Future<FinanceDocument> readDocument() async {
     final data = await _getAuthenticated('/api/state');
     try {
@@ -169,6 +172,44 @@ class BackendClient {
     } on FormatException {
       throw const ApiFailure(
           'La API devolvió un perfil con un formato inválido.');
+    }
+  }
+
+  @override
+  Future<int> putDocument(Map<String, dynamic> payload, int generation) async {
+    _checkUrl();
+    if (generation != _sessionGeneration || !await hasSession()) {
+      throw const SaveFailure(SaveStatus.sessionChanged);
+    }
+    final cookie = await _store.read();
+    if (generation != _sessionGeneration) {
+      throw const SaveFailure(SaveStatus.sessionChanged);
+    }
+    try {
+      final response = await _dio.put<Object?>('/api/state',
+          data: payload, options: Options(headers: {'Cookie': cookie}));
+      if (generation != _sessionGeneration) {
+        throw const SaveFailure(SaveStatus.sessionChanged);
+      }
+      final value = response.data;
+      if (value is! Map || value['version'] is! int) {
+        throw const SaveFailure(SaveStatus.uncertain);
+      }
+      return value['version'] as int;
+    } on DioException catch (e) {
+      if (generation != _sessionGeneration) {
+        throw const SaveFailure(SaveStatus.sessionChanged);
+      }
+      if (e.response?.statusCode == 401) {
+        _sessionGeneration++;
+        await _store.clear();
+        throw const SaveFailure(SaveStatus.sessionChanged);
+      }
+      throw SaveFailure(switch (e.response?.statusCode) {
+        409 => SaveStatus.conflict,
+        400 || 403 => SaveStatus.rejected,
+        _ => SaveStatus.uncertain,
+      });
     }
   }
 

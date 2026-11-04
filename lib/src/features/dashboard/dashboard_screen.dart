@@ -6,6 +6,9 @@ import '../../core/app_theme.dart';
 import 'application/dashboard_controller.dart';
 import 'domain/dashboard_snapshot.dart';
 import 'domain/month_summary.dart';
+import '../movements/domain/finance_commands.dart';
+import '../movements/presentation/operation_screen.dart';
+import '../movements/presentation/operation_form.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -19,6 +22,80 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   int destination = 0;
   DateTime month = DateTime(DateTime.now().year, DateTime.now().month);
   String? category;
+  Future<void> review(DashboardSnapshot data, String title,
+      void Function(FinanceCommands) prepare) async {
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => OperationScreen(
+            document: data.document, title: title, prepare: prepare)));
+  }
+
+  Future<Map<String, String>?> form(String title, List<InputSpec> fields) =>
+      Navigator.of(context).push<Map<String, String>>(MaterialPageRoute(
+          builder: (_) => OperationForm(title: title, fields: fields)));
+  double amount(String? value) =>
+      double.tryParse((value ?? '').trim().replaceAll(',', '.')) ?? double.nan;
+  Future<void> newExpense(DashboardSnapshot data) async {
+    final categories =
+        (data.document.fields['cats'] as List? ?? []).cast<String>();
+    final methods =
+        (data.document.fields['meths'] as List? ?? []).cast<String>();
+    if (categories.isEmpty || methods.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content:
+              Text('Primero configura categorías y tipos de pago en la web.')));
+      return;
+    }
+    final result = await form('Nuevo gasto · ${monthLabel(month)}', [
+      const InputSpec('name', 'Nombre'),
+      const InputSpec('amount', 'Monto COP sin separador de miles',
+          numeric: true),
+      InputSpec('category', 'Categoría',
+          initial: categories.first,
+          options: {for (final c in categories) c: c}),
+      InputSpec('method', 'Tipo de pago',
+          initial: methods.first, options: {for (final m in methods) m: m}),
+      InputSpec('account', 'Cuenta', required: false, options: {
+        '': 'Sin cuenta',
+        for (final a in data.finances.accounts) a.id: a.name
+      }),
+      const InputSpec('repeat', 'Número de meses (1 a 600)',
+          initial: '1', numeric: true),
+    ]);
+    if (!mounted || result == null) return;
+    await review(
+        data,
+        'Crear gasto: ${result['name']}',
+        (commands) => commands.addExpense(
+            name: result['name']!,
+            amount: amount(result['amount']),
+            month: monthKey(month),
+            category: result['category']!,
+            method: result['method']!,
+            account: result['account'] == '' ? null : result['account'],
+            repeat: int.tryParse(result['repeat']!) ?? 0));
+  }
+
+  Future<void> newAccount(DashboardSnapshot data) async {
+    final result = await form('Nueva cuenta', [
+      const InputSpec('name', 'Nombre'),
+      const InputSpec('type', 'Tipo', initial: 'Ahorros', options: {
+        'Ahorros': 'Ahorros',
+        'Corriente': 'Corriente',
+        'Inversión': 'Inversión',
+        'Efectivo': 'Efectivo',
+        'Crédito': 'Crédito'
+      }),
+      const InputSpec('balance', 'Saldo COP sin separador de miles',
+          initial: '0', numeric: true)
+    ]);
+    if (!mounted || result == null) return;
+    await review(
+        data,
+        'Crear cuenta: ${result['name']}',
+        (commands) => commands.addAccount(
+            result['name']!, result['type']!, amount(result['balance'])));
+  }
+
   static const destinations = [
     'Resumen',
     'Movimientos',
@@ -158,8 +235,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         .where((row) => category == null || row.category == category);
     return [
       period(),
-      const Text(
-          'Consulta de gastos y cuotas guardados. Los pagos se gestionan en la web durante esta etapa.'),
+      FilledButton.icon(
+          onPressed: () => newExpense(data),
+          icon: const Icon(Icons.add),
+          label: const Text('Nuevo gasto')),
       if (category != null)
         TextButton.icon(
             onPressed: () => setState(() => category = null),
@@ -179,12 +258,71 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Text(accounts.isEmpty
                   ? 'Sin cuenta vinculada'
                   : accounts.first.name),
+              if (row.id != null)
+                Wrap(spacing: 8, children: [
+                  if (!row.paid)
+                    TextButton(
+                        onPressed: () async {
+                          final result = await form('Cuenta de ${row.name}', [
+                            InputSpec('account', 'Cuenta',
+                                required: false,
+                                initial: row.accountId ?? '',
+                                options: {
+                                  '': 'Sin cuenta',
+                                  for (final a in data.finances.accounts)
+                                    a.id: a.name
+                                })
+                          ]);
+                          if (!mounted || result == null) return;
+                          final id = result['account']!;
+                          await review(
+                              data,
+                              'Cambiar cuenta: ${row.name}',
+                              (c) => c.assignAccount(
+                                  row.id!, id.isEmpty ? null : id));
+                        },
+                        child: const Text('Elegir cuenta')),
+                  TextButton(
+                      onPressed: () => review(
+                          data,
+                          '${row.paid ? "Deshacer pago" : "Pagar"}: ${row.name}',
+                          (c) => c.togglePayment(row.id!)),
+                      child: Text(row.paid ? 'Deshacer pago' : 'Pagar')),
+                  if (!row.linkedPlan)
+                    TextButton(
+                        onPressed: () => review(data, 'Eliminar: ${row.name}',
+                            (c) => c.deleteExpense(row.id!)),
+                        child: const Text('Eliminar')),
+                  if (!row.paid && !row.linkedPlan)
+                    TextButton(
+                        onPressed: () async {
+                          final result = await form(
+                              row.series
+                                  ? 'Mover serie hacia adelante'
+                                  : 'Mover gasto',
+                              [
+                                InputSpec('month', 'Nuevo mes AAAA-MM',
+                                    initial: addMonth(monthKey(month), 1))
+                              ]);
+                          if (!mounted || result == null) return;
+                          await review(
+                              data,
+                              'Mover ${row.name} a ${result['month']}',
+                              (c) => c.move(row.id!, result['month']!,
+                                  series: row.series));
+                        },
+                        child: Text(row.series ? 'Mover serie' : 'Mover mes')),
+                ]),
             ]));
       }),
     ];
   }
 
   List<Widget> accounts(DashboardSnapshot data) => [
+        FilledButton.icon(
+            onPressed: () => newAccount(data),
+            icon: const Icon(Icons.add),
+            label: const Text('Nueva cuenta')),
         card('Saldo neto de cuentas', money(data.finances.netBalance)),
         const Text(
             'Saldos actuales guardados. Las cuentas de crédito restan del neto.'),
@@ -193,12 +331,84 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           const Text('Aún no tienes cuentas. Puedes crearlas en la web.'),
         ...data.finances.accounts.map((a) => card(
             a.name,
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [Text(a.type), money(a.balance)]))),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(a.type),
+              money(a.balance),
+              Wrap(spacing: 8, children: [
+                TextButton(
+                    onPressed: () async {
+                      final result = await form('Editar saldo: ${a.name}', [
+                        InputSpec('value', 'Saldo COP sin separador de miles',
+                            initial: a.balance.toString(), numeric: true)
+                      ]);
+                      if (!mounted || result == null) return;
+                      await review(
+                          data,
+                          'Editar saldo: ${a.name}',
+                          (c) => c.setAccountBalance(
+                              a.id, amount(result['value'])));
+                    },
+                    child: const Text('Editar saldo')),
+                TextButton(
+                    onPressed: () async {
+                      final result = await form('Ingresar USD: ${a.name}', [
+                        const InputSpec('value', 'Monto USD', numeric: true)
+                      ]);
+                      if (!mounted || result == null) return;
+                      await review(
+                          data,
+                          'Convertir ${result['value']} USD a tasa ${data.document.fields['rate']}',
+                          (c) => c.depositUsd(a.id, amount(result['value'])));
+                    },
+                    child: const Text('Ingresar USD')),
+              ])
+            ]))),
       ];
 
-  List<Widget> appearance() => [
+  List<Widget> appearance(DashboardSnapshot data) => [
+        FilledButton(
+            onPressed: () async {
+              final result = await form('Ingreso de ${monthLabel(month)}', [
+                const InputSpec(
+                    'value', 'Ingreso COP; vacío vuelve al salario × tasa',
+                    numeric: true, required: false)
+              ]);
+              if (!mounted || result == null) return;
+              final value = result['value']!.trim().isEmpty
+                  ? null
+                  : amount(result['value']);
+              await review(
+                  data,
+                  'Ingreso ${monthKey(month)}: ${value == null ? "salario × tasa" : cop(value.isFinite ? value : 0)}',
+                  (c) => c.setIncome(monthKey(month), value));
+            },
+            child: Text('Ingreso de ${monthLabel(month)}')),
+        for (final key in ['cats', 'meths'])
+          card(
+              key == 'cats' ? 'Categorías' : 'Tipos de pago',
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                for (final option in (data.document.fields[key] as List? ?? [])
+                    .cast<String>())
+                  Wrap(alignment: WrapAlignment.spaceBetween, children: [
+                    Text(option),
+                    TextButton(
+                        onPressed: () => review(
+                            data,
+                            'Eliminar opción: $option',
+                            (c) => c.removeOption(key, option)),
+                        child: const Text('Eliminar'))
+                  ]),
+                TextButton.icon(
+                    icon: const Icon(Icons.add),
+                    label: const Text('Agregar opción'),
+                    onPressed: () async {
+                      final result = await form(
+                          'Nueva opción', [const InputSpec('value', 'Nombre')]);
+                      if (!mounted || result == null) return;
+                      await review(data, 'Agregar opción: ${result['value']}',
+                          (c) => c.addOption(key, result['value']!));
+                    }),
+              ])),
         const Text(
             'Elige el estilo de este dispositivo. Se conserva al cerrar sesión.'),
         const SizedBox(height: 16),
@@ -228,7 +438,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     child: Text(entry.value))))),
         const SizedBox(height: 24),
         const Text(
-            'Finanzas Móvil · v0.2.0 (2)\nEtapa 1 · consulta y apariencia'),
+            'Finanzas Móvil · v0.3.0 (3)\nEtapa 2 · operaciones con confirmación'),
       ];
 
   Widget content(DashboardSnapshot data) {
@@ -238,7 +448,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         0 => overview(data, MonthSummary(data.document, month)),
         1 => movements(data, MonthSummary(data.document, month)),
         2 => accounts(data),
-        _ => appearance(),
+        _ => appearance(data),
       };
     } on FormatException {
       children = [

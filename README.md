@@ -1,8 +1,8 @@
 # Finanzas Móvil
 
-## Entrega actual: 0.2.0+2
+## Entrega actual: 0.3.0+3
 
-Esta entrega incluye Resumen, Movimientos mensuales, Cuentas y Apariencia. Son consultas reales tras iniciar sesión. Ver [versiones por etapa](docs/VERSIONING.md), [changelog](CHANGELOG.md) y [validación de la entrega](docs/PHASE1_VALIDATION.md). Los módulos mutables siguen en desarrollo; este APK no envía escrituras financieras.
+Esta entrega incluye Resumen, Movimientos mensuales, Cuentas y Apariencia. Son consultas reales tras iniciar sesión. Ver [versiones por etapa](docs/VERSIONING.md), [changelog](CHANGELOG.md) y [validación de la entrega](docs/PHASE2_VALIDATION.md). Esta versión incorpora gastos, pagos, cuentas, categorías e ingreso con vista previa y confirmación antes de guardar. Los planes completos y el resumen anual siguen pendientes.
 
 - [Inventario funcional y referencias verificadas](docs/FUNCTIONAL_INVENTORY.md)
 - [Contrato completo de API, permisos, versiones y conflictos](docs/API_CONTRACT.md)
@@ -15,7 +15,7 @@ Esta entrega incluye Resumen, Movimientos mensuales, Cuentas y Apariencia. Son c
 
 La referencia de la auditoría está fijada en el commit web/backend `7a8380f999850900e4ed8cb5802cf92964bf16dd`. No se modifica ese repositorio ni PostgreSQL. La versión del documento y los campos desconocidos se conservan como snapshot inmutable de lectura; no se reconstruyen futuros guardados desde los conteos de la pantalla.
 
-Cliente Flutter de consulta para Android e iOS. Consume exclusivamente la API existente de `Avera123/finanzas-backend`: login por correo y contraseña, perfil, estado y logout. No contiene operaciones para modificar finanzas ni conexión directa a PostgreSQL.
+Cliente Flutter para Android e iOS. Consume exclusivamente la API existente de `Avera123/finanzas-backend`: login por correo y contraseña, perfil, estado y logout. Las modificaciones usan únicamente PUT /api/state confirmado y versionado. No hay conexión directa a PostgreSQL.
 
 ## Requisitos
 

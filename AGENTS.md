@@ -36,3 +36,7 @@ Ejecutar según alcance: flutter pub get --enforce-lockfile; dart format --outpu
 iOS necesita macOS/Xcode; pruebas de Keychain/Keystore físico requieren dispositivo. Registrar solo resultados ejecutados, SHA/entorno, limitaciones, evidencia visual sin información privada y enlace al PR. No afirmar que se probó producción, accesibilidad física, portado financiero o distribución si solo existen mocks, documentación o simulador.
 
 Mantener los siete entregables exigidos y el informe de fase. Un cambio de presentación reversible no necesita aprobación adicional salvo regla explícita del usuario; la aprobación financiera y la revisión entre fases sí son obligatorias. No solicitar contraseñas por chat.
+
+<!-- codebase-memory-mcp:start -->
+For structural codebase exploration, use the installed codebase-memory skill.
+<!-- codebase-memory-mcp:end -->
