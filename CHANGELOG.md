@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0+5 — Etapa 4 — 2026-11-04
+
+- Ahorros compartidos, miembros, aportes, retiros, metas y cuentas vinculadas.
+- Inversiones fijas, porcentuales o por meta, proyección estimada y cuotas reprogramables.
+- Permisos y actualización compartida con confirmación; 121 pruebas aprobadas.
+
+
 ## 0.4.0+4 — Etapa 3 — 2026-11-04
 
 - Deudas en cinco modos, interés implícito, abonos, cuotas abiertas y aplazamientos.

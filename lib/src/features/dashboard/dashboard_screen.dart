@@ -10,6 +10,7 @@ import '../movements/domain/finance_commands.dart';
 import '../movements/presentation/operation_screen.dart';
 import '../movements/presentation/operation_form.dart';
 import '../plans/presentation/plans_screen.dart';
+import '../plans/presentation/capital_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -164,6 +165,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       });
 
   List<Widget> overview(DashboardSnapshot data, MonthSummary summary) => [
+        OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const CapitalScreen())),
+            icon: const Icon(Icons.savings_outlined),
+            label: const Text('Ahorros e inversiones')),
         OutlinedButton.icon(
             onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const PlansScreen())),
@@ -443,7 +449,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     padding: const EdgeInsets.all(12),
                     child: Text(entry.value))))),
         const SizedBox(height: 24),
-        const Text('Finanzas Móvil · v0.4.0 (4)\nEtapa 3 · deudas y préstamos'),
+        const Text(
+            'Finanzas Móvil · v0.5.0 (5)\nEtapa 4 · ahorros e inversiones'),
       ];
 
   Widget content(DashboardSnapshot data) {

@@ -1,0 +1,634 @@
+{
+  "source": "7a8380f999850900e4ed8cb5802cf92964bf16dd/src/finance.js",
+  "investmentCases": [
+    {
+      "name": "fixed",
+      "data": {
+        "usd": 1000,
+        "rate": 4,
+        "inc": {
+          "2026-12": 2000
+        },
+        "acc": [],
+        "exp": [],
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "inv": {
+        "id": "i",
+        "name": "Fixture",
+        "mode": "fixed",
+        "value": 100,
+        "months": 4,
+        "startM": "2026-11",
+        "rate": 12
+      },
+      "now": "2026-11",
+      "expectedRows": [
+        {
+          "m": "2026-11",
+          "amt": 100
+        },
+        {
+          "m": "2026-12",
+          "amt": 100
+        },
+        {
+          "m": "2027-01",
+          "amt": 100
+        },
+        {
+          "m": "2027-02",
+          "amt": 100
+        }
+      ],
+      "expectedPath": [
+        {
+          "m": "2026-11",
+          "contributed": 100,
+          "value": 101
+        },
+        {
+          "m": "2026-12",
+          "contributed": 200,
+          "value": 203
+        },
+        {
+          "m": "2027-01",
+          "contributed": 300,
+          "value": 306
+        },
+        {
+          "m": "2027-02",
+          "contributed": 400,
+          "value": 410
+        }
+      ]
+    },
+    {
+      "name": "percent",
+      "data": {
+        "usd": 1000,
+        "rate": 4,
+        "inc": {
+          "2026-12": 2000
+        },
+        "acc": [],
+        "exp": [],
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "inv": {
+        "id": "i",
+        "name": "Fixture",
+        "mode": "percent",
+        "value": 10,
+        "months": 4,
+        "startM": "2026-11",
+        "rate": 12
+      },
+      "now": "2026-11",
+      "expectedRows": [
+        {
+          "m": "2026-11",
+          "amt": 400
+        },
+        {
+          "m": "2026-12",
+          "amt": 200
+        },
+        {
+          "m": "2027-01",
+          "amt": 400
+        },
+        {
+          "m": "2027-02",
+          "amt": 400
+        }
+      ],
+      "expectedPath": [
+        {
+          "m": "2026-11",
+          "contributed": 400,
+          "value": 404
+        },
+        {
+          "m": "2026-12",
+          "contributed": 600,
+          "value": 610
+        },
+        {
+          "m": "2027-01",
+          "contributed": 1000,
+          "value": 1019
+        },
+        {
+          "m": "2027-02",
+          "contributed": 1400,
+          "value": 1433
+        }
+      ]
+    },
+    {
+      "name": "paid",
+      "data": {
+        "usd": 1000,
+        "rate": 4,
+        "inc": {
+          "2026-12": 2000
+        },
+        "acc": [],
+        "exp": [
+          {
+            "m": "2026-11",
+            "amt": 80,
+            "paid": true,
+            "investId": "i"
+          }
+        ],
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "inv": {
+        "id": "i",
+        "name": "Fixture",
+        "mode": "fixed",
+        "value": 100,
+        "months": 4,
+        "startM": "2026-11",
+        "rate": 12
+      },
+      "now": "2026-11",
+      "expectedRows": [
+        {
+          "m": "2026-12",
+          "amt": 100
+        },
+        {
+          "m": "2027-01",
+          "amt": 100
+        },
+        {
+          "m": "2027-02",
+          "amt": 100
+        }
+      ],
+      "expectedPath": [
+        {
+          "m": "2026-11",
+          "contributed": 80,
+          "value": 81
+        },
+        {
+          "m": "2026-12",
+          "contributed": 180,
+          "value": 182
+        },
+        {
+          "m": "2027-01",
+          "contributed": 280,
+          "value": 285
+        },
+        {
+          "m": "2027-02",
+          "contributed": 380,
+          "value": 389
+        }
+      ]
+    },
+    {
+      "name": "deferred",
+      "data": {
+        "usd": 1000,
+        "rate": 4,
+        "inc": {
+          "2026-12": 2000
+        },
+        "acc": [],
+        "exp": [],
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "inv": {
+        "id": "i",
+        "name": "Fixture",
+        "mode": "fixed",
+        "value": 100,
+        "months": 4,
+        "startM": "2026-11",
+        "rate": 12,
+        "resumeM": "2027-02"
+      },
+      "now": "2026-11",
+      "expectedRows": [
+        {
+          "m": "2027-02",
+          "amt": 100
+        },
+        {
+          "m": "2027-03",
+          "amt": 100
+        },
+        {
+          "m": "2027-04",
+          "amt": 100
+        },
+        {
+          "m": "2027-05",
+          "amt": 100
+        }
+      ],
+      "expectedPath": [
+        {
+          "m": "2027-02",
+          "contributed": 100,
+          "value": 101
+        },
+        {
+          "m": "2027-03",
+          "contributed": 200,
+          "value": 203
+        },
+        {
+          "m": "2027-04",
+          "contributed": 300,
+          "value": 306
+        },
+        {
+          "m": "2027-05",
+          "contributed": 400,
+          "value": 410
+        }
+      ]
+    }
+  ],
+  "contributionCases": [
+    {
+      "name": "different-accounts",
+      "data": {
+        "acc": [
+          {
+            "id": "a",
+            "name": "Source",
+            "type": "Ahorros",
+            "bal": 1000
+          },
+          {
+            "id": "b",
+            "name": "Fund",
+            "type": "Ahorros",
+            "bal": 500
+          }
+        ],
+        "savings": [
+          {
+            "id": "s",
+            "name": "Fixture fund",
+            "start": 500,
+            "startM": "2026-11",
+            "target": 5000,
+            "isOwner": true,
+            "acc": "b",
+            "members": [
+              {
+                "id": "me",
+                "name": "Me",
+                "email": "me@example.test",
+                "mine": true,
+                "monthly": 100,
+                "acc": "a"
+              },
+              {
+                "id": "other",
+                "name": "Other",
+                "email": "other@example.test",
+                "mine": false,
+                "monthly": 150,
+                "acc": null
+              }
+            ]
+          }
+        ],
+        "contrib": [
+          {
+            "id": "c",
+            "savingId": "s",
+            "memberId": "me",
+            "m": "2026-11",
+            "amt": 100,
+            "done": false,
+            "extra": false
+          }
+        ]
+      },
+      "expected": {
+        "acc": [
+          {
+            "id": "a",
+            "name": "Source",
+            "type": "Ahorros",
+            "bal": 900
+          },
+          {
+            "id": "b",
+            "name": "Fund",
+            "type": "Ahorros",
+            "bal": 600
+          }
+        ],
+        "savings": [
+          {
+            "id": "s",
+            "name": "Fixture fund",
+            "start": 500,
+            "startM": "2026-11",
+            "target": 5000,
+            "isOwner": true,
+            "acc": "b",
+            "members": [
+              {
+                "id": "me",
+                "name": "Me",
+                "email": "me@example.test",
+                "mine": true,
+                "monthly": 100,
+                "acc": "a"
+              },
+              {
+                "id": "other",
+                "name": "Other",
+                "email": "other@example.test",
+                "mine": false,
+                "monthly": 150,
+                "acc": null
+              }
+            ]
+          }
+        ],
+        "contrib": [
+          {
+            "id": "c",
+            "savingId": "s",
+            "memberId": "me",
+            "m": "2026-11",
+            "amt": 100,
+            "done": true,
+            "extra": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "same-account",
+      "data": {
+        "acc": [
+          {
+            "id": "a",
+            "name": "Source",
+            "type": "Ahorros",
+            "bal": 1000
+          },
+          {
+            "id": "b",
+            "name": "Fund",
+            "type": "Ahorros",
+            "bal": 500
+          }
+        ],
+        "savings": [
+          {
+            "id": "s",
+            "name": "Fixture fund",
+            "start": 500,
+            "startM": "2026-11",
+            "target": 5000,
+            "isOwner": true,
+            "acc": "a",
+            "members": [
+              {
+                "id": "me",
+                "name": "Me",
+                "email": "me@example.test",
+                "mine": true,
+                "monthly": 100,
+                "acc": "a"
+              },
+              {
+                "id": "other",
+                "name": "Other",
+                "email": "other@example.test",
+                "mine": false,
+                "monthly": 150,
+                "acc": null
+              }
+            ]
+          }
+        ],
+        "contrib": [
+          {
+            "id": "c",
+            "savingId": "s",
+            "memberId": "me",
+            "m": "2026-11",
+            "amt": 100,
+            "done": false,
+            "extra": false
+          }
+        ]
+      },
+      "expected": {
+        "acc": [
+          {
+            "id": "a",
+            "name": "Source",
+            "type": "Ahorros",
+            "bal": 1000
+          },
+          {
+            "id": "b",
+            "name": "Fund",
+            "type": "Ahorros",
+            "bal": 500
+          }
+        ],
+        "savings": [
+          {
+            "id": "s",
+            "name": "Fixture fund",
+            "start": 500,
+            "startM": "2026-11",
+            "target": 5000,
+            "isOwner": true,
+            "acc": "a",
+            "members": [
+              {
+                "id": "me",
+                "name": "Me",
+                "email": "me@example.test",
+                "mine": true,
+                "monthly": 100,
+                "acc": "a"
+              },
+              {
+                "id": "other",
+                "name": "Other",
+                "email": "other@example.test",
+                "mine": false,
+                "monthly": 150,
+                "acc": null
+              }
+            ]
+          }
+        ],
+        "contrib": [
+          {
+            "id": "c",
+            "savingId": "s",
+            "memberId": "me",
+            "m": "2026-11",
+            "amt": 100,
+            "done": true,
+            "extra": false
+          }
+        ]
+      }
+    }
+  ],
+  "reconcileInput": {
+    "acc": [
+      {
+        "id": "a",
+        "name": "Source",
+        "type": "Ahorros",
+        "bal": 1000
+      },
+      {
+        "id": "b",
+        "name": "Fund",
+        "type": "Ahorros",
+        "bal": 500
+      }
+    ],
+    "savings": [
+      {
+        "id": "s",
+        "name": "Fixture fund",
+        "start": 500,
+        "startM": "2026-11",
+        "target": 5000,
+        "isOwner": true,
+        "acc": "b",
+        "members": [
+          {
+            "id": "me",
+            "name": "Me",
+            "email": "me@example.test",
+            "mine": true,
+            "monthly": 100,
+            "acc": "a"
+          },
+          {
+            "id": "other",
+            "name": "Other",
+            "email": "other@example.test",
+            "mine": false,
+            "monthly": 150,
+            "acc": null
+          }
+        ]
+      }
+    ],
+    "contrib": [
+      {
+        "id": "foreign",
+        "savingId": "s",
+        "memberId": "other",
+        "m": "2026-11",
+        "amt": 150,
+        "done": true,
+        "extra": false
+      }
+    ]
+  },
+  "reconcileExpected": {
+    "acc": [
+      {
+        "id": "a",
+        "name": "Source",
+        "type": "Ahorros",
+        "bal": 1000
+      },
+      {
+        "id": "b",
+        "name": "Fund",
+        "type": "Ahorros",
+        "bal": 650
+      }
+    ],
+    "savings": [
+      {
+        "id": "s",
+        "name": "Fixture fund",
+        "start": 500,
+        "startM": "2026-11",
+        "target": 5000,
+        "isOwner": true,
+        "acc": "b",
+        "members": [
+          {
+            "id": "me",
+            "name": "Me",
+            "email": "me@example.test",
+            "mine": true,
+            "monthly": 100,
+            "acc": "a"
+          },
+          {
+            "id": "other",
+            "name": "Other",
+            "email": "other@example.test",
+            "mine": false,
+            "monthly": 150,
+            "acc": null
+          }
+        ]
+      }
+    ],
+    "contrib": [
+      {
+        "id": "foreign",
+        "savingId": "s",
+        "memberId": "other",
+        "m": "2026-11",
+        "amt": 150,
+        "done": true,
+        "extra": false
+      }
+    ],
+    "fundSeen": {
+      "foreign": 150
+    }
+  },
+  "goals": [
+    {
+      "target": 1200,
+      "months": 12,
+      "annual": 0,
+      "expected": 100
+    },
+    {
+      "target": 5000,
+      "months": 24,
+      "annual": 12,
+      "expected": 185
+    }
+  ]
+}
