@@ -49,7 +49,7 @@ flutter pub outdated
 
 Las pruebas usan un adaptador HTTP falso y almacenamiento en memoria: no hay peticiones a producción ni operaciones financieras. Las de almacenamiento verifican la integración Dart del plugin con su mock; no sustituyen comprobar Keychain/Keystore en dispositivos físicos.
 
-La automatización en `.github/workflows/flutter.yml` ejecuta análisis, pruebas y compilaciones Android debug e iOS simulador al abrir un PR hacia `master`. Usa una URL reservada que no apunta a ninguna API real. No necesita secretos ni despliega.
+La automatización en `.github/workflows/flutter.yml` ejecuta análisis, pruebas y compilaciones Android debug e iOS simulador al abrir un PR hacia `master`. El APK Android de prueba se configura con la URL pública https://finanzas-backend-vnr8.onrender.com; la build iOS usa una URL reservada. Compilar no hace solicitudes a esas APIs. No necesita secretos ni despliega.
 
 Ver [resultados y limitaciones](docs/VALIDATION.md).
 
@@ -83,3 +83,7 @@ El saldo de cuentas suma ahorros/efectivo y resta las cuentas cuyo tipo es `Cré
 `pubspec.lock` fija las versiones resueltas: Dio 5.11.1, Riverpod 2.6.1, go_router 14.8.1, flutter_secure_storage 9.2.4 y flutter_lints 5.0.0. Se ajustó el mínimo Dart a 3.5 por los lints, y se fijó el mínimo Flutter a la versión que generó los archivos nativos. La resolución efectiva del lock requiere Dart 3.13, incluido en Flutter 3.47.9.
 
 `flutter pub outdated` confirma versiones mayores disponibles de Riverpod, go_router y almacenamiento seguro; no se hicieron migraciones mayores a ciegas. La cadena multiplataforma antigua de almacenamiento también trae paquetes descontinuados para web/macOS (`js`, `flutter_secure_storage_macos`), aunque esta app solo apunta a Android/iOS. Las compilaciones Android debug e iOS simulador también pasaron en CI. Esto no equivale a una auditoría de vulnerabilidades ni comprueba Keystore/Keychain en hardware; verificar su funcionamiento antes de distribución.
+
+## APK para probar
+
+En GitHub Actions, abre una ejecución correcta de Flutter verification y descarga el artefacto finanzas-movil-android-debug. El ZIP contiene app-debug.apk, configurado para tu servicio de Render. Los artefactos se conservan 7 días. Es una build de desarrollo; al abrirla introduce la misma contraseña que está configurada en APP_PASSWORD del servicio web, no las credenciales de PostgreSQL. No hay contraseñas incluidas en el APK.
