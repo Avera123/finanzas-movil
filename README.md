@@ -1,8 +1,8 @@
 # Finanzas Móvil
 
-## Entrega actual: 0.5.0+5
+## Entrega actual: 0.6.0+6
 
-Esta entrega incluye Resumen, Movimientos mensuales, Cuentas y Apariencia. Son consultas reales tras iniciar sesión. Ver [versiones por etapa](docs/VERSIONING.md), [changelog](CHANGELOG.md) y [validación de la entrega](docs/PHASE4_VALIDATION.md). Esta versión incorpora gastos, pagos, cuentas, categorías e ingreso con vista previa y confirmación antes de guardar. Deudas y préstamos están disponibles desde Resumen. Ahorros e inversiones también están disponibles desde Resumen. Anual, ajustes completos y usuarios siguen pendientes.
+Esta entrega incluye Resumen, Movimientos mensuales, Cuentas y Apariencia. Son consultas reales tras iniciar sesión. Ver [versiones por etapa](docs/VERSIONING.md), [changelog](CHANGELOG.md) y [validación de la entrega](docs/PHASE5A_VALIDATION.md). Incluye gastos, pagos, cuentas, categorías e ingreso con vista previa y confirmación antes de guardar. Deudas, préstamos, ahorros e inversiones están disponibles desde Resumen. La nueva opción **Resumen anual** muestra doce meses, detalle de pagos y proyección. Ajustes completos, administración de usuarios y exportación siguen pendientes; la etapa 5 se entrega por incrementos.
 
 - [Inventario funcional y referencias verificadas](docs/FUNCTIONAL_INVENTORY.md)
 - [Contrato completo de API, permisos, versiones y conflictos](docs/API_CONTRACT.md)
