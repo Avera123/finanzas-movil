@@ -1,7 +1,7 @@
 name: finanzas_movil
 description: Aplicación móvil de finanzas personales
 publish_to: none
-version: 0.1.0+1
+version: 0.2.0+2
 environment:
   sdk: '>=3.5.0 <4.0.0'
   flutter: '>=3.47.9'

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'core/app_theme.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
@@ -22,14 +23,9 @@ class FinanzasApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
         title: 'Finanzas Móvil',
         debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.dark,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFFF2B84B),
-            brightness: Brightness.dark,
-          ),
-        ),
+        themeMode: ThemeMode.system,
+        theme: financeTheme(ref.watch(themeProvider), Brightness.light),
+        darkTheme: financeTheme(ref.watch(themeProvider), Brightness.dark),
         routerConfig: ref.watch(routerProvider),
       );
 }

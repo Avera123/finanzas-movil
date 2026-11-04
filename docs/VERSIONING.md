@@ -1,0 +1,16 @@
+# Versiones por etapa
+
+Cada etapa incrementa la versión minor y el número de compilación. Las correcciones de una entrega incrementan patch y build. El APK, pubspec, pantalla Apariencia y changelog identifican la entrega. Ninguna versión se fusiona automáticamente con master.
+
+| Versión | Etapa | Estado |
+| --- | --- | --- |
+| 0.1.0+1 | Base, auditoría y sesión | PR #4 |
+| 0.2.0+2 | Consulta útil y apariencia | Implementada, validación en PHASE1_VALIDATION.md |
+| 0.3.0+3 | Guardado seguro, cuentas/categorías/gastos y movimientos de pagos | Pendiente |
+| 0.4.0+4 | Deudas y préstamos | Pendiente |
+| 0.5.0+5 | Ahorros e inversiones | Pendiente |
+| 0.6.0+6 | Anual, ajustes y usuarios | Pendiente |
+| 0.7.0+7 | Accesibilidad y distribución de prueba | Pendiente |
+| 1.0.0 | Distribución estable | Solo tras aceptación y firma del propietario |
+
+El usuario autorizó continuar las etapas el 4 de noviembre de 2026. Sigue vigente la confirmación explícita dentro de la app antes de cada escritura financiera y la prohibición de probar escrituras contra producción. La revisión del PR no implica merge automático.
