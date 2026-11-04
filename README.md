@@ -1,13 +1,13 @@
 # Finanzas Móvil
 
-Cliente Flutter de consulta para Android e iOS. Consume exclusivamente la API existente de `Avera123/finanzas-backend`: login, estado y logout. No contiene operaciones para modificar finanzas ni conexión directa a PostgreSQL.
+Cliente Flutter de consulta para Android e iOS. Consume exclusivamente la API existente de `Avera123/finanzas-backend`: login por correo y contraseña, perfil, estado y logout. No contiene operaciones para modificar finanzas ni conexión directa a PostgreSQL.
 
 ## Requisitos
 
 - Flutter **3.47.9 stable**, con Dart **3.13.7** (versiones usadas para generar y validar esta base).
 - Android: Android Studio, SDK y cmdline-tools, licencias aceptadas y JDK compatible con Gradle 9.3.1 (CI usa Java 21). Ejecutar `flutter doctor -v` y `flutter doctor --android-licenses` en tu equipo.
 - iOS: **macOS**, Xcode y CocoaPods. El proyecto requiere iOS **15.0+**. La configuración incluye Swift Package Manager y Podfile para plugins que aún usan CocoaPods.
-- Una instancia HTTPS **ya inicializada** de la API. No hace falta volver a ejecutar `flutter create`: `android/` e `ios/` están versionados.
+- Una instancia HTTPS de la API multiusuario actual, con la cuenta creada o invitación aceptada desde la web. No hace falta volver a ejecutar `flutter create`: `android/` e `ios/` están versionados.
 
 ## Instalar y ejecutar
 
@@ -19,7 +19,7 @@ flutter devices
 flutter run -d <ID_DEL_DISPOSITIVO> --dart-define=API_BASE_URL=https://tu-api.example
 ```
 
-`API_BASE_URL` es solo el origen HTTPS, sin `/api`, ruta, query, fragmento ni credenciales. Es configuración pública compilada en la aplicación. No pasar contraseñas, cookies, tokens ni `DATABASE_URL` mediante dart-define. La contraseña se introduce en la pantalla de login.
+`API_BASE_URL` es solo el origen HTTPS, sin `/api`, ruta, query, fragmento ni credenciales. Es configuración pública compilada en la aplicación. No pasar contraseñas, cookies, tokens ni `DATABASE_URL` mediante dart-define. El correo y la contraseña de tu cuenta se introducen en el login. No se utiliza la antigua APP_PASSWORD compartida.
 
 En Android, ejecutar en un emulador o dispositivo con depuración USB. La build de desarrollo se obtiene con:
 
@@ -56,16 +56,16 @@ Ver [resultados y limitaciones](docs/VALIDATION.md).
 ## Seguridad y autenticación
 
 - HTTPS obligatorio, redirecciones deshabilitadas y timeouts de conexión, envío y recepción. Se conserva la validación TLS normal; no se aceptan certificados inválidos.
-- Cookie `sesion` guardada con `flutter_secure_storage`: almacenamiento cifrado de Android y Keychain de iOS, accesible solo con el dispositivo desbloqueado y sin migración a otro dispositivo en iOS. Android excluye backups y transferencias.
+- Cookie multiusuario `sesion` (usuario, versión, vencimiento y firma) guardada con `flutter_secure_storage`: almacenamiento cifrado de Android y Keychain de iOS, accesible solo con el dispositivo desbloqueado y sin migración a otro dispositivo en iOS. Android excluye backups y transferencias.
 - Las claves de sesión están separadas por URL de API. La cookie global del scaffold anterior se elimina y requiere volver a iniciar sesión.
 - La contraseña no se persiste. No hay logs HTTP con contraseñas/cookies ni caché financiera en disco.
 - Sesión restaurada al abrir, con comprobación local de formato y vencimiento. El servidor valida la firma en cada consulta. Un 401 borra la sesión y ofrece volver a entrar; red/500 permite reintentar sin inventar datos.
 - Logout borra la sesión local incluso si la red falla. El backend actual solo expira la cookie y no revoca una copia robada del token.
-- Es el login por contraseña compartida que existe actualmente. No se inventaron endpoints de usuarios, OAuth ni refresh token.
+- Login por correo y contraseña con el contrato actual. El dashboard muestra el perfil obtenido de GET /api/me y consulta únicamente los datos autorizados por esa sesión. Se descartan las cookies antiguas y el estado anterior al cambiar de cuenta. Google nativo no está implementado; configura una contraseña desde la web si tu cuenta solo usa Google.
 
 Contrato verificado y referencias de código en [docs/API_CONTRACT.md](docs/API_CONTRACT.md).
 
-**Efecto del GET existente:** `/api/state` puede inicializar el seed si PostgreSQL está vacío. Este cliente no puede garantizar lectura estricta del lado del servidor. Por eso no se llamó ese endpoint real durante esta tarea; confirmar que la instancia tiene datos antes de usarla. No se modificó el backend para evitar ese efecto.
+**Contrato actualizado:** el GET /api/state actual llama readUserState y solo consulta los datos del usuario. Ya no carga el seed automáticamente. Si no existe su documento devuelve 404; la app muestra un error y no crea datos.
 
 ## Estructura
 
@@ -86,4 +86,4 @@ El saldo de cuentas suma ahorros/efectivo y resta las cuentas cuyo tipo es `Cré
 
 ## APK para probar
 
-En GitHub Actions, abre una ejecución correcta de Flutter verification y descarga el artefacto finanzas-movil-android-debug. El ZIP contiene app-debug.apk, configurado para tu servicio de Render. Los artefactos se conservan 7 días. Es una build de desarrollo; al abrirla introduce la misma contraseña que está configurada en APP_PASSWORD del servicio web, no las credenciales de PostgreSQL. No hay contraseñas incluidas en el APK.
+En GitHub Actions, abre una ejecución correcta de Flutter verification y descarga el artefacto finanzas-movil-android-debug. El ZIP contiene app-debug.apk, configurado para tu servicio de Render. Los artefactos se conservan 7 días. Es una build de desarrollo; al abrirla introduce el correo y la contraseña de tu cuenta de Finanzas, como en la web. No uses APP_PASSWORD ni las credenciales de PostgreSQL. No hay contraseñas incluidas en el APK.

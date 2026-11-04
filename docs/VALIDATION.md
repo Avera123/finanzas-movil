@@ -1,3 +1,23 @@
+# Revalidación de autenticación multiusuario
+
+Contrato actualizado el 3 de noviembre de 2026, con referencias exactas en API_CONTRACT.md. El backend y PostgreSQL no se modificaron.
+
+## Validación local actual
+
+Flutter 3.47.9 stable / Dart 3.13.7, Windows:
+
+- `flutter pub get --enforce-lockfile`: correcto, sin cambios de dependencias.
+- `flutter analyze --no-pub`: `No issues found!`.
+- `flutter test --no-pub --reporter expanded`: **36 pruebas aprobadas**.
+
+Se agregó cobertura para enviar correo y contraseña, normalizar únicamente el correo, rechazar cookies del sistema anterior, validar la cookie multiusuario, obtener /api/me, manejar perfiles inválidos/inactivos, revocación y permisos, y cambiar entre dos cuentas sin reutilizar sus datos financieros. Los tests usan exclusivamente datos sintéticos y transporte falso.
+
+El APK e iOS actualizados se validan en el workflow del PR. Los resultados nativos de la base anterior se conservan abajo como historial y no deben confundirse con la revalidación actual.
+
+Pendiente de prueba manual: credenciales reales introducidas por el usuario en el emulador, persistencia/revocación contra producción y Keystore/Keychain en dispositivos físicos. No se solicitaron contraseñas ni se hacen escrituras financieras. El móvil sigue siendo de consulta.
+
+---
+
 # Validación de esta base
 
 Fecha: 3 de noviembre de 2026 (America/Bogota).

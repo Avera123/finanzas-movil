@@ -24,6 +24,7 @@ class FakeAdapter implements HttpClientAdapter {
   int status = 200;
   Object? body = <String, dynamic>{'ok': true};
   Map<String, List<String>> headers = {};
+  final bodiesByPath = <String, Object?>{};
   DioExceptionType? failure;
   final requests = <RequestOptions>[];
   @override
@@ -33,10 +34,15 @@ class FakeAdapter implements HttpClientAdapter {
     if (failure != null) {
       throw DioException(requestOptions: options, type: failure!);
     }
-    return ResponseBody.fromString(jsonEncode(body), status, headers: {
-      Headers.contentTypeHeader: ['application/json'],
-      ...headers,
-    });
+    return ResponseBody.fromString(
+        jsonEncode(bodiesByPath.containsKey(options.path)
+            ? bodiesByPath[options.path]
+            : body),
+        status,
+        headers: {
+          Headers.contentTypeHeader: ['application/json'],
+          ...headers,
+        });
   }
 
   @override
@@ -45,8 +51,22 @@ class FakeAdapter implements HttpClientAdapter {
 
 final testNow = DateTime.utc(2026, 11, 3);
 // Synthetic fixture only, not a valid signed credential.
-String testCookie({bool expired = false}) =>
-    'sesion=${testNow.add(Duration(days: expired ? -1 : 1)).millisecondsSinceEpoch}.${List.filled(64, 'a').join()}';
+String testCookie(
+        {bool expired = false,
+        String userId = 'fixture-user',
+        int version = 1}) =>
+    'sesion=$userId.$version.${testNow.add(Duration(days: expired ? -1 : 1)).millisecondsSinceEpoch}.${List.filled(64, 'a').join()}';
+Map<String, Object?> profileFixture(
+        {String userId = 'fixture-user', String email = 'test@example.test'}) =>
+    {
+      'id': userId,
+      'email': email,
+      'name': 'Usuario de prueba',
+      'role': 'user',
+      'active': true,
+      'hasPassword': true,
+      'google': false,
+    };
 Map<String, dynamic> stateFixture() => {
       'acc': [
         {'id': 'a', 'name': 'Test savings', 'type': 'Ahorros', 'bal': 1000000},

@@ -11,6 +11,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final email = TextEditingController();
   final password = TextEditingController();
   bool loading = true;
   String? error;
@@ -35,12 +36,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void dispose() {
+    email.dispose();
     password.dispose();
     super.dispose();
   }
 
   Future<void> submit() async {
     if (loading) return;
+    if (!emailPattern.hasMatch(email.text.trim())) {
+      setState(() => error = 'Escribe un correo válido.');
+      return;
+    }
     if (password.text.trim().isEmpty) {
       setState(() => error = 'Escribe tu contraseña.');
       return;
@@ -50,7 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       error = null;
     });
     try {
-      await ref.read(backendClientProvider).login(password.text);
+      await ref.read(backendClientProvider).login(email.text, password.text);
       password.clear();
       ref.invalidate(financeStateProvider);
       if (mounted) context.go('/dashboard');
@@ -81,6 +87,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       style: Theme.of(context).textTheme.headlineMedium),
                   const SizedBox(height: 24),
                   TextField(
+                      key: const ValueKey('email'),
+                      controller: email,
+                      enabled: !loading,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      textCapitalization: TextCapitalization.none,
+                      decoration: const InputDecoration(
+                          labelText: 'Correo electrónico')),
+                  const SizedBox(height: 16),
+                  TextField(
+                      key: const ValueKey('password'),
                       controller: password,
                       obscureText: true,
                       enabled: !loading,
