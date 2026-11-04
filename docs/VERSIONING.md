@@ -5,8 +5,8 @@ Cada etapa incrementa la versión minor y el número de compilación. Las correc
 | Versión | Etapa | Estado |
 | --- | --- | --- |
 | 0.1.0+1 | Base, auditoría y sesión | PR #4 |
-| 0.2.0+2 | Consulta útil y apariencia | Implementada, validación en PHASE1_VALIDATION.md |
-| 0.3.0+3 | Guardado seguro, cuentas/categorías/gastos y movimientos de pagos | Pendiente |
+| 0.2.0+2 | Consulta útil y apariencia | PR #5, 57 tests; Android/iOS CI aprobados |
+| 0.3.0+3 | Guardado seguro, cuentas/categorías/gastos y movimientos de pagos | Implementada, validación en PHASE2_VALIDATION.md; baja de cuentas pendiente |
 | 0.4.0+4 | Deudas y préstamos | Pendiente |
 | 0.5.0+5 | Ahorros e inversiones | Pendiente |
 | 0.6.0+6 | Anual, ajustes y usuarios | Pendiente |

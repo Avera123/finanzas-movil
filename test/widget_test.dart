@@ -167,6 +167,8 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.tap(find.byIcon(Icons.account_balance_wallet_outlined));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Test savings'), 150,
+          scrollable: find.byType(Scrollable).last);
       expect(find.text('Test savings'), findsOneWidget);
       expect(tester.takeException(), isNull);
       await tester.tap(find.byIcon(Icons.receipt_long_outlined));
@@ -176,6 +178,8 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.tap(find.byIcon(Icons.palette_outlined));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Sistema'), 150,
+          scrollable: find.byType(Scrollable).last);
       expect(find.text('Sistema'), findsOneWidget);
       expect(tester.takeException(), isNull);
       expect(adapter.requests.every((r) => r.method == 'GET'), isTrue);
