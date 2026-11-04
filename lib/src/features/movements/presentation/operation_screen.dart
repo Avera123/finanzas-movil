@@ -68,9 +68,24 @@ class _OperationScreenState extends ConsumerState<OperationScreen> {
         'dueOn': 'Vencimiento',
         'on': 'Fecha',
         'amt': 'Monto COP',
-        'note': 'Nota'
+        'note': 'Nota',
+        'bank': 'Banco',
+        'start': 'Saldo inicial COP',
+        'target': 'Meta COP',
+        'months': 'Meses',
+        'value': 'Valor fijo o porcentaje',
+        'm': 'Mes',
+        'done': 'Realizado',
+        'extra': 'Movimiento extra'
       };
-      for (final key in ['debts', 'loans', 'loanPay']) {
+      for (final key in [
+        'debts',
+        'loans',
+        'loanPay',
+        'investments',
+        'savings',
+        'contrib'
+      ]) {
         final oldItems =
             (widget.document.fields[key] as List? ?? []).cast<Map>();
         final newItems = (draft.fields[key] as List? ?? []).cast<Map>();
@@ -84,14 +99,36 @@ class _OperationScreenState extends ConsumerState<OperationScreen> {
               style: const TextStyle(fontWeight: FontWeight.bold)));
           for (final label in labels.entries) {
             if (item[label.key] != null) {
-              changes.add(Text('${label.value}: ${item[label.key]}'));
+              final value = label.key == 'mode'
+                  ? const {
+                        'fixed': 'Cuota fija',
+                        'fast': 'Menor tiempo',
+                        'open': 'Saldo desconocido',
+                        'percent': 'Porcentaje del ingreso'
+                      }[item[label.key]] ??
+                      item[label.key]
+                  : item[label.key] is bool
+                      ? (item[label.key] == true ? 'Sí' : 'No')
+                      : item[label.key];
+              changes.add(Text(
+                  '${key == 'investments' && label.key == 'rate' ? 'Rendimiento anual esperado %' : label.value}: $value'));
             }
+          }
+          if (item.containsKey('acc')) {
+            final account = after.where((a) => a.id == item['acc']);
+            changes.add(Text(account.isEmpty
+                ? 'Sin cuenta vinculada'
+                : 'Cuenta: ${account.first.name}'));
+          }
+          for (final member in (item['members'] as List? ?? []).cast<Map>()) {
+            changes.add(Text(
+                '${member['name']} · aporte ${cop(member['monthly'] as num)} al mes${member['email'] == null || member['email'] == '' ? '' : ' · ${member['email']}'}'));
           }
         }
         for (final item in oldItems) {
           if (!newItems.any((e) => e['id'] == item['id'])) {
             changes.add(Text(
-                'Eliminar registro: ${item['name'] ?? item['person'] ?? item['on']}'));
+                'Eliminar registro: ${item['name'] ?? item['person'] ?? item['on'] ?? item['m']}'));
           }
         }
       }
