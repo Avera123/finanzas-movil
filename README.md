@@ -1,5 +1,20 @@
 # Finanzas Móvil
 
+## Misión y Fase 0
+
+Esta entrega audita la paridad con la web y deja acceso/perfil/consulta verificados; los módulos financieros completos se implementan por fases después de revisión. El móvil aún no ofrece la totalidad de la web y no envía escrituras financieras.
+
+- [Inventario funcional y referencias verificadas](docs/FUNCTIONAL_INVENTORY.md)
+- [Contrato completo de API, permisos, versiones y conflictos](docs/API_CONTRACT.md)
+- [Estrategia UX y mapa de navegación propuesto](docs/UX_STRATEGY.md)
+- [Sistema de diseño para la siguiente fase](docs/DESIGN_SYSTEM.md)
+- [Arquitectura implementada y sincronización futura](docs/ARCHITECTURE.md)
+- [Fases y criterios de aceptación](docs/IMPLEMENTATION_PLAN.md)
+- [Instrucciones permanentes](AGENTS.md)
+- [Validación de Fase 0](docs/PHASE0_VALIDATION.md)
+
+La referencia de la auditoría está fijada en el commit web/backend `7a8380f999850900e4ed8cb5802cf92964bf16dd`. No se modifica ese repositorio ni PostgreSQL. La versión del documento y los campos desconocidos se conservan como snapshot inmutable de lectura; no se reconstruyen futuros guardados desde los conteos de la pantalla.
+
 Cliente Flutter de consulta para Android e iOS. Consume exclusivamente la API existente de `Avera123/finanzas-backend`: login por correo y contraseña, perfil, estado y logout. No contiene operaciones para modificar finanzas ni conexión directa a PostgreSQL.
 
 ## Requisitos

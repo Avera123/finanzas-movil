@@ -2,22 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/api/backend_client.dart';
-import '../../core/models/finance_state.dart';
-import '../../core/models/user_profile.dart';
-
-class DashboardData {
-  const DashboardData(this.profile, this.finances);
-  final UserProfile profile;
-  final FinanceState finances;
-}
-
-final financeStateProvider =
-    FutureProvider.autoDispose<DashboardData>((ref) async {
-  final client = ref.watch(backendClientProvider);
-  final profile = await client.readProfile();
-  final finances = await client.readState();
-  return DashboardData(profile, finances);
-});
+import 'application/dashboard_controller.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});

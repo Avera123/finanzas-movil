@@ -1,5 +1,7 @@
 # Revalidación de autenticación multiusuario
 
+La entrega posterior de Fase 0 y su cobertura ampliada están en [PHASE0_VALIDATION.md](PHASE0_VALIDATION.md). Este archivo conserva resultados anteriores como historial.
+
 Contrato actualizado el 3 de noviembre de 2026, con referencias exactas en API_CONTRACT.md. El backend y PostgreSQL no se modificaron.
 
 ## Validación local actual

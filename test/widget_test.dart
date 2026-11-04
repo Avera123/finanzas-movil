@@ -131,7 +131,7 @@ void main() {
     };
     adapter.bodiesByPath['/api/me'] =
         profileFixture(userId: 'other-user', email: 'other@example.test');
-    adapter.bodiesByPath['/api/state'] = {'acc': [], 'exp': []};
+    adapter.bodiesByPath['/api/state'] = {'version': 1, 'acc': [], 'exp': []};
     await tester.enterText(
         find.byKey(const ValueKey('email')), 'other@example.test');
     await tester.enterText(

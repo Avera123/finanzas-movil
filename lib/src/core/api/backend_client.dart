@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/finance_state.dart';
+import '../models/finance_document.dart';
 import '../models/user_profile.dart';
 
 const backendUrl = String.fromEnvironment('API_BASE_URL');
@@ -78,6 +79,8 @@ class BackendClient {
   final SessionStore _store;
   final String _baseUrl;
   final DateTime Function() _now;
+  int _sessionGeneration = 0;
+  int get sessionGeneration => _sessionGeneration;
   void _checkUrl() {
     final uri = Uri.tryParse(_baseUrl);
     if (uri == null ||
@@ -106,6 +109,7 @@ class BackendClient {
     final cookie = await _store.read();
     if (cookie == null) return false;
     if (_validCookie(cookie)) return true;
+    _sessionGeneration++;
     await _store.clear();
     return false;
   }
@@ -119,6 +123,7 @@ class BackendClient {
     if (password.trim().isEmpty) {
       throw const ApiFailure('Escribe tu contraseña.');
     }
+    _sessionGeneration++;
     await _store.clear();
     try {
       final response = await _dio.post<Object?>('/api/login',
@@ -145,9 +150,13 @@ class BackendClient {
   }
 
   Future<FinanceState> readState() async {
+    return (await readDocument()).summary;
+  }
+
+  Future<FinanceDocument> readDocument() async {
     final data = await _getAuthenticated('/api/state');
     try {
-      return FinanceState.fromJson(data);
+      return FinanceDocument.fromJson(data);
     } on FormatException {
       throw const ApiFailure('La API devolvió datos con un formato inválido.');
     }
@@ -165,22 +174,35 @@ class BackendClient {
 
   Future<Object?> _getAuthenticated(String path) async {
     _checkUrl();
+    final generation = _sessionGeneration;
     if (!await hasSession()) {
       throw const ApiFailure('Inicia sesión para continuar.',
           unauthorized: true);
     }
     final cookie = await _store.read();
+    if (generation != _sessionGeneration) {
+      throw const ApiFailure('La sesión cambió. Vuelve a cargar tus datos.',
+          unauthorized: true);
+    }
     try {
       final response = await _dio.get<Object?>(path,
           options: Options(headers: {'Cookie': cookie}));
+      if (generation != _sessionGeneration) {
+        throw const ApiFailure('La sesión cambió. Vuelve a cargar tus datos.',
+            unauthorized: true);
+      }
       return response.data;
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) await _store.clear();
+      if (e.response?.statusCode == 401 && generation == _sessionGeneration) {
+        _sessionGeneration++;
+        await _store.clear();
+      }
       throw _failure(e);
     }
   }
 
   Future<void> logout() async {
+    _sessionGeneration++;
     try {
       _checkUrl();
       final cookie = await _store.read();

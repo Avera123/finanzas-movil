@@ -8,6 +8,8 @@ class UserProfile {
   final String email;
   final String name;
   final String role;
+  // Presentation capability only. The server authorizes each operation.
+  bool get canManageUsers => role == 'admin';
 
   factory UserProfile.fromJson(Object? json) {
     if (json is! Map<String, dynamic> ||

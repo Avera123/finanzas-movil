@@ -25,12 +25,14 @@ class FakeAdapter implements HttpClientAdapter {
   Object? body = <String, dynamic>{'ok': true};
   Map<String, List<String>> headers = {};
   final bodiesByPath = <String, Object?>{};
+  Future<void> Function(RequestOptions)? beforeResponse;
   DioExceptionType? failure;
   final requests = <RequestOptions>[];
   @override
   Future<ResponseBody> fetch(RequestOptions options,
       Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
     requests.add(options);
+    await beforeResponse?.call(options);
     if (failure != null) {
       throw DioException(requestOptions: options, type: failure!);
     }
@@ -68,6 +70,7 @@ Map<String, Object?> profileFixture(
       'google': false,
     };
 Map<String, dynamic> stateFixture() => {
+      'version': 1,
       'acc': [
         {'id': 'a', 'name': 'Test savings', 'type': 'Ahorros', 'bal': 1000000},
         {'id': 'b', 'name': 'Test credit', 'type': 'Crédito', 'bal': 200000},

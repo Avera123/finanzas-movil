@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finanzas_movil/src/core/api/backend_client.dart';
@@ -223,5 +224,59 @@ void main() {
         throwsA(isA<ApiFailure>()
             .having((e) => e.message, 'message', contains('permiso'))));
     expect(store.value, testCookie());
+  });
+
+  test('La lectura conserva versión; una respuesta sin versión no se acepta',
+      () async {
+    store.value = testCookie();
+    adapter.body = {...stateFixture(), 'version': 9, 'investments': []};
+    final doc = await client.readDocument();
+    expect(doc.version, 9);
+    expect(doc.fields['investments'], isEmpty);
+    adapter.body = {'acc': [], 'exp': []};
+    await expectLater(client.readDocument(), throwsA(isA<ApiFailure>()));
+  });
+
+  test('La Fase 0 solo envía login, perfil, consulta y logout', () async {
+    adapter.headers = {
+      'set-cookie': [testCookie()]
+    };
+    await client.login('test@example.test', 'synthetic-test-input');
+    adapter.body = profileFixture();
+    await client.readProfile();
+    adapter.body = stateFixture();
+    await client.readDocument();
+    await client.logout();
+    expect(adapter.requests.map((r) => '${r.method} ${r.path}'), [
+      'POST /api/login',
+      'GET /api/me',
+      'GET /api/state',
+      'POST /api/logout',
+    ]);
+  });
+
+  test('Un 401 tardío de otra sesión no borra la cookie del nuevo usuario',
+      () async {
+    store.value = testCookie();
+    final started = Completer<void>(), release = Completer<void>();
+    adapter.beforeResponse = (r) async {
+      if (r.path == '/api/me') {
+        started.complete();
+        await release.future;
+      }
+    };
+    final oldRead = client.readProfile();
+    await started.future;
+    await client.logout();
+    adapter.headers = {
+      'set-cookie': [testCookie(userId: 'other-user')]
+    };
+    await client.login('other@example.test', 'synthetic-other-input');
+    adapter.status = 401;
+    final expectation = expectLater(oldRead, throwsA(isA<ApiFailure>()));
+    release.complete();
+    await expectation;
+    expect(store.value, testCookie(userId: 'other-user'));
+    expect(await client.hasSession(), true);
   });
 }
