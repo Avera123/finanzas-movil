@@ -43,7 +43,13 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get --enforce-lockfile
-      - run: flutter build apk --debug --no-pub --dart-define=API_BASE_URL=https://api.example.invalid
+      - run: flutter build apk --debug --no-pub --dart-define=API_BASE_URL=https://finanzas-backend-vnr8.onrender.com
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finanzas-movil-android-debug
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
   ios:
     runs-on: macos-latest
     timeout-minutes: 30
