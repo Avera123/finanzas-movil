@@ -4,8 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/finance_state.dart';
+import '../models/finance_document.dart';
+import '../models/user_profile.dart';
 
 const backendUrl = String.fromEnvironment('API_BASE_URL');
+final emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
 final backendClientProvider = Provider<BackendClient>((ref) {
   final client = BackendClient();
   ref.onDispose(client.close);
@@ -76,6 +79,8 @@ class BackendClient {
   final SessionStore _store;
   final String _baseUrl;
   final DateTime Function() _now;
+  int _sessionGeneration = 0;
+  int get sessionGeneration => _sessionGeneration;
   void _checkUrl() {
     final uri = Uri.tryParse(_baseUrl);
     if (uri == null ||
@@ -91,9 +96,12 @@ class BackendClient {
   }
 
   bool _validCookie(String value) {
-    // Contract verified in server/app.js: milliseconds expiry and SHA-256 HMAC.
-    final match = RegExp(r'^sesion=(\d+)\.([a-f0-9]{64})$').firstMatch(value);
-    final expiry = match == null ? null : int.tryParse(match.group(1)!);
+    // Multiuser contract: userId.sessionVersion.expiryMs.hmac.
+    // The HMAC and account status/version are validated ONLY by the server.
+    final match =
+        RegExp(r'^sesion=([A-Za-z0-9_-]+)\.([1-9]\d*)\.(\d+)\.([a-f0-9]{64})$')
+            .firstMatch(value);
+    final expiry = match == null ? null : int.tryParse(match.group(3)!);
     return expiry != null && expiry > _now().millisecondsSinceEpoch;
   }
 
@@ -101,19 +109,25 @@ class BackendClient {
     final cookie = await _store.read();
     if (cookie == null) return false;
     if (_validCookie(cookie)) return true;
+    _sessionGeneration++;
     await _store.clear();
     return false;
   }
 
-  Future<void> login(String password) async {
+  Future<void> login(String email, String password) async {
     _checkUrl();
+    final normalizedEmail = email.trim().toLowerCase();
+    if (!emailPattern.hasMatch(normalizedEmail)) {
+      throw const ApiFailure('Escribe un correo válido.');
+    }
     if (password.trim().isEmpty) {
       throw const ApiFailure('Escribe tu contraseña.');
     }
+    _sessionGeneration++;
     await _store.clear();
     try {
-      final response =
-          await _dio.post<Object?>('/api/login', data: {'password': password});
+      final response = await _dio.post<Object?>('/api/login',
+          data: {'email': normalizedEmail, 'password': password});
       if (response.data is! Map || (response.data as Map)['ok'] != true) {
         throw const ApiFailure('Respuesta de inicio de sesión inválida.');
       }
@@ -127,7 +141,7 @@ class BackendClient {
       }
       await _store.write(session);
     } on DioException catch (e) {
-      throw _failure(e);
+      throw _failure(e, login: true);
     } on FormatException {
       throw const ApiFailure('El servidor no devolvió una sesión válida.');
     } on HttpException {
@@ -136,25 +150,59 @@ class BackendClient {
   }
 
   Future<FinanceState> readState() async {
-    _checkUrl();
-    if (!await hasSession()) {
-      throw const ApiFailure('Inicia sesión para continuar.',
-          unauthorized: true);
-    }
-    final cookie = await _store.read();
+    return (await readDocument()).summary;
+  }
+
+  Future<FinanceDocument> readDocument() async {
+    final data = await _getAuthenticated('/api/state');
     try {
-      final response = await _dio.get<Object?>('/api/state',
-          options: Options(headers: {'Cookie': cookie}));
-      return FinanceState.fromJson(response.data);
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 401) await _store.clear();
-      throw _failure(e);
+      return FinanceDocument.fromJson(data);
     } on FormatException {
       throw const ApiFailure('La API devolvió datos con un formato inválido.');
     }
   }
 
+  Future<UserProfile> readProfile() async {
+    final data = await _getAuthenticated('/api/me');
+    try {
+      return UserProfile.fromJson(data);
+    } on FormatException {
+      throw const ApiFailure(
+          'La API devolvió un perfil con un formato inválido.');
+    }
+  }
+
+  Future<Object?> _getAuthenticated(String path) async {
+    _checkUrl();
+    final generation = _sessionGeneration;
+    if (!await hasSession()) {
+      throw const ApiFailure('Inicia sesión para continuar.',
+          unauthorized: true);
+    }
+    final cookie = await _store.read();
+    if (generation != _sessionGeneration) {
+      throw const ApiFailure('La sesión cambió. Vuelve a cargar tus datos.',
+          unauthorized: true);
+    }
+    try {
+      final response = await _dio.get<Object?>(path,
+          options: Options(headers: {'Cookie': cookie}));
+      if (generation != _sessionGeneration) {
+        throw const ApiFailure('La sesión cambió. Vuelve a cargar tus datos.',
+            unauthorized: true);
+      }
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401 && generation == _sessionGeneration) {
+        _sessionGeneration++;
+        await _store.clear();
+      }
+      throw _failure(e);
+    }
+  }
+
   Future<void> logout() async {
+    _sessionGeneration++;
     try {
       _checkUrl();
       final cookie = await _store.read();
@@ -169,9 +217,15 @@ class BackendClient {
     }
   }
 
-  ApiFailure _failure(DioException e) => switch (e.response?.statusCode) {
-        401 => const ApiFailure('Contraseña incorrecta o sesión vencida.',
+  ApiFailure _failure(DioException e, {bool login = false}) =>
+      switch (e.response?.statusCode) {
+        401 => ApiFailure(
+            login
+                ? 'Correo o contraseña incorrectos.'
+                : 'Tu sesión venció o fue revocada. Vuelve a iniciar sesión.',
             unauthorized: true),
+        403 =>
+          const ApiFailure('No tienes permiso para realizar esta consulta.'),
         429 => const ApiFailure('Demasiados intentos. Espera 15 minutos.'),
         _ => ApiFailure(e.response == null
             ? 'No se pudo conectar. Revisa tu conexión e inténtalo de nuevo.'

@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/api/backend_client.dart';
-import '../../core/models/finance_state.dart';
-
-final financeStateProvider = FutureProvider.autoDispose<FinanceState>(
-  (ref) => ref.watch(backendClientProvider).readState(),
-);
+import 'application/dashboard_controller.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -77,14 +73,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   )));
         },
         data: (data) => ListView(padding: const EdgeInsets.all(20), children: [
+          Text(data.profile.name,
+              style: Theme.of(context).textTheme.titleLarge),
+          Text(data.profile.email),
+          Text(data.profile.role == 'admin' ? 'Administrador' : 'Usuario'),
+          const SizedBox(height: 20),
           Text('Saldo neto de cuentas',
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
-          Text('\$ ${data.netBalance.toStringAsFixed(0)} COP',
+          Text('\$ ${data.finances.netBalance.toStringAsFixed(0)} COP',
               style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 24),
-          Text('Cuentas: ${data.accounts.length}'),
-          Text('Gastos registrados: ${data.expenseCount}'),
+          Text('Cuentas: ${data.finances.accounts.length}'),
+          Text('Gastos registrados: ${data.finances.expenseCount}'),
           const SizedBox(height: 16),
           const Text(
               'Ahorros y efectivo menos cuentas de crédito. No incluye otras deudas ni préstamos.'),

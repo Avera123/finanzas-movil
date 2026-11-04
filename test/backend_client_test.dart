@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finanzas_movil/src/core/api/backend_client.dart';
@@ -24,9 +25,11 @@ void main() {
         '${testCookie()}; HttpOnly; Path=/; Secure'
       ]
     };
-    await client.login('synthetic-test-input');
+    await client.login('test@example.test', 'synthetic-test-input');
     expect(store.value, testCookie());
     expect(adapter.requests.single.path, '/api/login');
+    expect(adapter.requests.single.data,
+        {'email': 'test@example.test', 'password': 'synthetic-test-input'});
     adapter.body = stateFixture();
     final data = await client.readState();
     expect(data.netBalance, 800000);
@@ -41,7 +44,8 @@ void main() {
       adapter.status = code;
       adapter.body = {'error': 'private server diagnostics'};
       await expectLater(
-          client.login('synthetic-test-input'), throwsA(isA<ApiFailure>()));
+          client.login('test@example.test', 'synthetic-test-input'),
+          throwsA(isA<ApiFailure>()));
       expect(store.value, isNull);
     }
   });
@@ -50,13 +54,16 @@ void main() {
       '',
       'other=x',
       'sesion=bad',
+      'sesion=${testNow.add(const Duration(days: 1)).millisecondsSinceEpoch}.${List.filled(64, 'a').join()}',
+      testCookie(version: 0),
       testCookie(expired: true)
     ]) {
       adapter.headers = {
         'set-cookie': [raw]
       };
       await expectLater(
-          client.login('synthetic-test-input'), throwsA(isA<ApiFailure>()));
+          client.login('test@example.test', 'synthetic-test-input'),
+          throwsA(isA<ApiFailure>()));
       expect(store.value, isNull);
     }
   });
@@ -65,8 +72,8 @@ void main() {
       'set-cookie': [testCookie()]
     };
     adapter.body = {'ok': false};
-    await expectLater(
-        client.login('synthetic-test-input'), throwsA(isA<ApiFailure>()));
+    await expectLater(client.login('test@example.test', 'synthetic-test-input'),
+        throwsA(isA<ApiFailure>()));
     expect(store.value, isNull);
   });
   test('Almacenamiento fallido no produce login exitoso', () async {
@@ -74,7 +81,8 @@ void main() {
     adapter.headers = {
       'set-cookie': [testCookie()]
     };
-    await expectLater(client.login('synthetic-test-input'), throwsStateError);
+    await expectLater(client.login('test@example.test', 'synthetic-test-input'),
+        throwsStateError);
     expect(store.value, isNull);
   });
   test('Sesión persistida se restaura; expirada se borra sin red', () async {
@@ -131,7 +139,8 @@ void main() {
       final other = BackendClient(
           dio: Dio()..httpClientAdapter = adapter, store: store, baseUrl: url);
       await expectLater(
-          other.login('synthetic-test-input'), throwsA(isA<ApiFailure>()));
+          other.login('test@example.test', 'synthetic-test-input'),
+          throwsA(isA<ApiFailure>()));
       other.close();
     }
     expect(adapter.requests, isEmpty);
@@ -141,9 +150,133 @@ void main() {
     adapter.headers = {
       'location': ['https://other.example.test']
     };
-    await expectLater(
-        client.login('synthetic-test-input'), throwsA(isA<ApiFailure>()));
+    await expectLater(client.login('test@example.test', 'synthetic-test-input'),
+        throwsA(isA<ApiFailure>()));
     expect(store.value, isNull);
     expect(adapter.requests.single.followRedirects, false);
+  });
+
+  test('Normaliza correo pero conserva contraseña exactamente', () async {
+    adapter.headers = {
+      'set-cookie': [testCookie()]
+    };
+    await client.login('  TEST@Example.Test  ', '  synthetic-test-input  ');
+    expect(adapter.requests.single.data,
+        {'email': 'test@example.test', 'password': '  synthetic-test-input  '});
+  });
+
+  test('Correo o contraseña vacíos no se envían', () async {
+    for (final email in ['', 'not-an-email', 'a@b', 'a b@example.test']) {
+      await expectLater(client.login(email, 'synthetic-test-input'),
+          throwsA(isA<ApiFailure>()));
+    }
+    await expectLater(
+        client.login('test@example.test', ' '), throwsA(isA<ApiFailure>()));
+    expect(adapter.requests, isEmpty);
+  });
+
+  test('Cookie antigua se elimina sin consultar servidor', () async {
+    store.value =
+        'sesion=${testNow.add(const Duration(days: 1)).millisecondsSinceEpoch}.${List.filled(64, 'a').join()}';
+    expect(await client.hasSession(), false);
+    expect(store.value, isNull);
+    expect(adapter.requests, isEmpty);
+  });
+
+  test('GET /api/me obtiene la identidad del servidor con la sesión', () async {
+    store.value = testCookie(version: 2);
+    adapter.body = profileFixture();
+    final profile = await client.readProfile();
+    expect(profile.email, 'test@example.test');
+    expect(profile.role, 'user');
+    expect(adapter.requests.single.path, '/api/me');
+    expect(adapter.requests.single.headers['Cookie'], testCookie(version: 2));
+  });
+
+  test('Perfil inválido o inactivo no se acepta', () async {
+    store.value = testCookie();
+    for (final body in [
+      null,
+      {},
+      {...profileFixture(), 'active': false}
+    ]) {
+      adapter.body = body;
+      await expectLater(client.readProfile(), throwsA(isA<ApiFailure>()));
+    }
+  });
+
+  test('Sesión revocada en /api/me se borra y exige login', () async {
+    store.value = testCookie();
+    adapter.status = 401;
+    await expectLater(
+        client.readProfile(),
+        throwsA(isA<ApiFailure>()
+            .having((e) => e.unauthorized, 'unauthorized', true)));
+    expect(store.value, isNull);
+    expect(adapter.requests.single.path, '/api/me');
+  });
+
+  test('403 informa permiso sin borrar una sesión válida', () async {
+    store.value = testCookie();
+    adapter.status = 403;
+    await expectLater(
+        client.readProfile(),
+        throwsA(isA<ApiFailure>()
+            .having((e) => e.message, 'message', contains('permiso'))));
+    expect(store.value, testCookie());
+  });
+
+  test('La lectura conserva versión; una respuesta sin versión no se acepta',
+      () async {
+    store.value = testCookie();
+    adapter.body = {...stateFixture(), 'version': 9, 'investments': []};
+    final doc = await client.readDocument();
+    expect(doc.version, 9);
+    expect(doc.fields['investments'], isEmpty);
+    adapter.body = {'acc': [], 'exp': []};
+    await expectLater(client.readDocument(), throwsA(isA<ApiFailure>()));
+  });
+
+  test('La Fase 0 solo envía login, perfil, consulta y logout', () async {
+    adapter.headers = {
+      'set-cookie': [testCookie()]
+    };
+    await client.login('test@example.test', 'synthetic-test-input');
+    adapter.body = profileFixture();
+    await client.readProfile();
+    adapter.body = stateFixture();
+    await client.readDocument();
+    await client.logout();
+    expect(adapter.requests.map((r) => '${r.method} ${r.path}'), [
+      'POST /api/login',
+      'GET /api/me',
+      'GET /api/state',
+      'POST /api/logout',
+    ]);
+  });
+
+  test('Un 401 tardío de otra sesión no borra la cookie del nuevo usuario',
+      () async {
+    store.value = testCookie();
+    final started = Completer<void>(), release = Completer<void>();
+    adapter.beforeResponse = (r) async {
+      if (r.path == '/api/me') {
+        started.complete();
+        await release.future;
+      }
+    };
+    final oldRead = client.readProfile();
+    await started.future;
+    await client.logout();
+    adapter.headers = {
+      'set-cookie': [testCookie(userId: 'other-user')]
+    };
+    await client.login('other@example.test', 'synthetic-other-input');
+    adapter.status = 401;
+    final expectation = expectLater(oldRead, throwsA(isA<ApiFailure>()));
+    release.complete();
+    await expectation;
+    expect(store.value, testCookie(userId: 'other-user'));
+    expect(await client.hasSession(), true);
   });
 }
