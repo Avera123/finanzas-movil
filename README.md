@@ -1,8 +1,8 @@
 # Finanzas Móvil
 
-## Misión y Fase 0
+## Entrega actual: 0.2.0+2
 
-Esta entrega audita la paridad con la web y deja acceso/perfil/consulta verificados; los módulos financieros completos se implementan por fases después de revisión. El móvil aún no ofrece la totalidad de la web y no envía escrituras financieras.
+Esta entrega incluye Resumen, Movimientos mensuales, Cuentas y Apariencia. Son consultas reales tras iniciar sesión. Ver [versiones por etapa](docs/VERSIONING.md), [changelog](CHANGELOG.md) y [validación de la entrega](docs/PHASE1_VALIDATION.md). Los módulos mutables siguen en desarrollo; este APK no envía escrituras financieras.
 
 - [Inventario funcional y referencias verificadas](docs/FUNCTIONAL_INVENTORY.md)
 - [Contrato completo de API, permisos, versiones y conflictos](docs/API_CONTRACT.md)

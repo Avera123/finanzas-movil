@@ -60,8 +60,8 @@ void main() {
     store.value = testCookie();
     adapter.body = stateFixture();
     await mount(tester);
-    expect(find.text('Resumen'), findsOneWidget);
-    expect(find.text(r'$ 800000 COP'), findsOneWidget);
+    expect(find.text('Resumen'), findsWidgets);
+    expect(find.text(r'$ 800.000 COP'), findsOneWidget);
     expect(find.text('test@example.test'), findsOneWidget);
     expect(find.text('Usuario'), findsOneWidget);
   });
@@ -121,10 +121,10 @@ void main() {
     await tester.tap(find.text('Ingresar'));
     await tester.pumpAndSettle();
     expect(find.text('test@example.test'), findsOneWidget);
-    expect(find.text(r'$ 800000 COP'), findsOneWidget);
+    expect(find.text(r'$ 800.000 COP'), findsOneWidget);
     await tester.tap(find.byTooltip('Cerrar sesión'));
     await tester.pumpAndSettle();
-    expect(find.text(r'$ 800000 COP'), findsNothing);
+    expect(find.text(r'$ 800.000 COP'), findsNothing);
     expect(store.value, isNull);
     adapter.headers = {
       'set-cookie': [testCookie(userId: 'other-user')]
@@ -140,8 +140,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('other@example.test'), findsOneWidget);
     expect(find.text('test@example.test'), findsNothing);
-    expect(find.text(r'$ 0 COP'), findsOneWidget);
-    expect(find.text(r'$ 800000 COP'), findsNothing);
+    expect(find.text(r'$ 0 COP'), findsWidgets);
+    expect(find.text(r'$ 800.000 COP'), findsNothing);
   });
 
   testWidgets('Perfil revocado no consulta finanzas ni muestra saldos',
@@ -153,4 +153,32 @@ void main() {
     expect(adapter.requests.map((r) => r.path), ['/api/me']);
     expect(find.textContaining('COP'), findsNothing);
   });
+  for (final width in [320.0, 390.0, 600.0, 768.0, 1024.0]) {
+    testWidgets('Navigation and large text at $width dp', (tester) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1;
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      store.value = testCookie();
+      adapter.body = stateFixture();
+      await mount(tester);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byIcon(Icons.account_balance_wallet_outlined));
+      await tester.pumpAndSettle();
+      expect(find.text('Test savings'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byIcon(Icons.receipt_long_outlined));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Mes siguiente'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byIcon(Icons.palette_outlined));
+      await tester.pumpAndSettle();
+      expect(find.text('Sistema'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      expect(adapter.requests.every((r) => r.method == 'GET'), isTrue);
+    });
+  }
 }

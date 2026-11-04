@@ -1,6 +1,6 @@
 # Plan de implementación y aceptación
 
-Referencia funcional: commit web/backend 7a8380f999850900e4ed8cb5802cf92964bf16dd. Fase 0 es el trabajo autorizado ahora; no se inicia la siguiente fase que afecte finanzas sin revisión. Ninguna fase se concentra en un PR único con todos los módulos.
+Referencia funcional: commit web/backend 7a8380f999850900e4ed8cb5802cf92964bf16dd. El usuario autorizó continuar las etapas el 4 de noviembre de 2026. Versiones y estado real en VERSIONING.md; cada escritura financiera conserva su confirmación y las pruebas siguen aisladas. Ninguna fase se concentra en un PR único con todos los módulos.
 
 ## Fase 0 — auditoría y base verificable (este PR)
 
