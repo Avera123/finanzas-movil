@@ -1,0 +1,288 @@
+{
+  "source": "7a8380f999850900e4ed8cb5802cf92964bf16dd/src/finance.js",
+  "data": {
+    "version": 1,
+    "usd": 1000,
+    "rate": 4,
+    "inc": {
+      "2026-12": 0
+    },
+    "acc": [],
+    "living": 600,
+    "debts": [
+      {
+        "id": "d",
+        "startM": "2026-10",
+        "total": 2000,
+        "rate": 2,
+        "mode": "fixed",
+        "cuota": 400
+      }
+    ],
+    "loans": [
+      {
+        "id": "l",
+        "total": 900,
+        "lentOn": "2026-10-15",
+        "dueOn": "2026-12-10",
+        "acc": "a"
+      },
+      {
+        "id": "late",
+        "total": 300,
+        "lentOn": "2026-09-01",
+        "dueOn": "2026-10-01",
+        "acc": null
+      }
+    ],
+    "loanPay": [
+      {
+        "loanId": "l",
+        "on": "2026-11-02",
+        "amt": 100
+      },
+      {
+        "loanId": "late",
+        "on": "2026-10-02",
+        "amt": 50
+      }
+    ],
+    "savings": [
+      {
+        "id": "s",
+        "start": 200,
+        "startM": "2026-10",
+        "endM": "2027-12",
+        "members": [
+          {
+            "id": "me",
+            "mine": true,
+            "monthly": 100
+          },
+          {
+            "id": "other",
+            "mine": false,
+            "monthly": 200
+          }
+        ]
+      }
+    ],
+    "contrib": [
+      {
+        "savingId": "s",
+        "memberId": "me",
+        "m": "2026-10",
+        "amt": 100,
+        "done": false
+      },
+      {
+        "savingId": "s",
+        "memberId": "me",
+        "m": "2026-11",
+        "amt": 100,
+        "done": true
+      },
+      {
+        "savingId": "s",
+        "memberId": "other",
+        "m": "2026-11",
+        "amt": 200,
+        "done": true
+      },
+      {
+        "savingId": "s",
+        "memberId": "me",
+        "m": "2026-12",
+        "amt": 100,
+        "done": false
+      }
+    ],
+    "exp": [
+      {
+        "m": "2026-10",
+        "amt": 400,
+        "debtId": "d",
+        "cat": "Deuda",
+        "name": "Cuota",
+        "paid": true
+      },
+      {
+        "m": "2026-11",
+        "amt": 400,
+        "debtId": "d",
+        "cat": "Deuda",
+        "name": "Cuota",
+        "paid": false
+      },
+      {
+        "m": "2026-12",
+        "amt": 400,
+        "debtId": "d",
+        "cat": "Deuda",
+        "name": "Cuota",
+        "paid": false
+      },
+      {
+        "m": "2026-10",
+        "amt": 50,
+        "investId": "i",
+        "cat": "Inversión",
+        "name": "Fondo",
+        "paid": false
+      },
+      {
+        "m": "2026-11",
+        "amt": 80,
+        "investId": "i",
+        "cat": "Inversión",
+        "name": "Fondo",
+        "paid": true
+      },
+      {
+        "m": "2026-12",
+        "amt": 90,
+        "investId": "i",
+        "cat": "Inversión",
+        "name": "Fondo",
+        "paid": false
+      },
+      {
+        "m": "2026-10",
+        "amt": 500,
+        "cat": "Casa",
+        "name": "Mercado",
+        "paid": true
+      },
+      {
+        "m": "2026-12",
+        "amt": 200,
+        "cat": "Casa",
+        "name": "Mercado",
+        "paid": false
+      }
+    ]
+  },
+  "now": "2026-11",
+  "cases": [
+    {
+      "month": "2026-09",
+      "expected": {
+        "k": "2026-09",
+        "income": 4000,
+        "living": 0,
+        "estimated": 0,
+        "debtPay": 0,
+        "savings": 0,
+        "invest": 0,
+        "investEnd": 0,
+        "loanIn": 0,
+        "loanOut": 0,
+        "total": 0,
+        "left": 4000,
+        "debtEnd": 0,
+        "savingsEnd": 0,
+        "receivable": 300
+      }
+    },
+    {
+      "month": "2026-10",
+      "expected": {
+        "k": "2026-10",
+        "income": 4000,
+        "living": 500,
+        "estimated": 0,
+        "debtPay": 400,
+        "savings": 100,
+        "invest": 50,
+        "investEnd": 0,
+        "loanIn": 50,
+        "loanOut": 900,
+        "total": 1050,
+        "left": 2100,
+        "debtEnd": 1600,
+        "savingsEnd": 200,
+        "receivable": 1150
+      }
+    },
+    {
+      "month": "2026-11",
+      "expected": {
+        "k": "2026-11",
+        "income": 4000,
+        "living": 0,
+        "estimated": 0,
+        "debtPay": 400,
+        "savings": 100,
+        "invest": 80,
+        "investEnd": 80,
+        "loanIn": 100,
+        "loanOut": 0,
+        "total": 580,
+        "left": 3520,
+        "debtEnd": 1232,
+        "savingsEnd": 500,
+        "receivable": 1050
+      }
+    },
+    {
+      "month": "2026-12",
+      "expected": {
+        "k": "2026-12",
+        "income": 0,
+        "living": 600,
+        "estimated": 400,
+        "debtPay": 400,
+        "savings": 100,
+        "invest": 90,
+        "investEnd": 170,
+        "loanIn": 800,
+        "loanOut": 0,
+        "total": 1190,
+        "left": -390,
+        "debtEnd": 856.6400000000001,
+        "savingsEnd": 600,
+        "receivable": 250
+      }
+    },
+    {
+      "month": "2027-01",
+      "expected": {
+        "k": "2027-01",
+        "income": 4000,
+        "living": 600,
+        "estimated": 600,
+        "debtPay": 0,
+        "savings": 100,
+        "invest": 0,
+        "investEnd": 170,
+        "loanIn": 0,
+        "loanOut": 0,
+        "total": 700,
+        "left": 3300,
+        "debtEnd": 873.7728000000001,
+        "savingsEnd": 600,
+        "receivable": 250
+      }
+    },
+    {
+      "month": "2027-12",
+      "expected": {
+        "k": "2027-12",
+        "income": 4000,
+        "living": 600,
+        "estimated": 600,
+        "debtPay": 0,
+        "savings": 100,
+        "invest": 0,
+        "investEnd": 170,
+        "loanIn": 0,
+        "loanOut": 0,
+        "total": 700,
+        "left": 3300,
+        "debtEnd": 1086.4266508940589,
+        "savingsEnd": 1200,
+        "receivable": 250
+      }
+    }
+  ]
+}

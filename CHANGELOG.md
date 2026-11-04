@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0+6 — Etapa 5a — 2026-11-04
+
+- Resumen anual de doce meses con navegación semestral y detalle por mes.
+- Tabla de ingresos, gastos, cuotas, ahorros, inversiones y préstamos; pagos agrupados por categoría y nombre.
+- Separa flujos del período y saldos al cierre; identifica pendientes y estimaciones.
+- Seis escenarios de paridad con el motor web y pruebas de interfaz a 320/768 dp con texto al 200 %.
+- Perfil, usuarios, exportaciones y ajustes completos quedan en etapa 5b.
+
 ## 0.5.0+5 — Etapa 4 — 2026-11-04
 
 - Ahorros compartidos, miembros, aportes, retiros, metas y cuentas vinculadas.

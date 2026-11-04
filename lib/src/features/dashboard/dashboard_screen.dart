@@ -6,6 +6,7 @@ import '../../core/app_theme.dart';
 import 'application/dashboard_controller.dart';
 import 'domain/dashboard_snapshot.dart';
 import 'domain/month_summary.dart';
+import 'annual_screen.dart';
 import '../movements/domain/finance_commands.dart';
 import '../movements/presentation/operation_screen.dart';
 import '../movements/presentation/operation_form.dart';
@@ -165,6 +166,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       });
 
   List<Widget> overview(DashboardSnapshot data, MonthSummary summary) => [
+        OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const AnnualScreen())),
+            icon: const Icon(Icons.table_chart_outlined),
+            label: const Text('Resumen anual')),
         OutlinedButton.icon(
             onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(builder: (_) => const CapitalScreen())),
@@ -449,8 +455,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     padding: const EdgeInsets.all(12),
                     child: Text(entry.value))))),
         const SizedBox(height: 24),
-        const Text(
-            'Finanzas Móvil · v0.5.0 (5)\nEtapa 4 · ahorros e inversiones'),
+        const Text('Finanzas Móvil · v0.6.0 (6)\nEtapa 5a · resumen anual'),
       ];
 
   Widget content(DashboardSnapshot data) {
