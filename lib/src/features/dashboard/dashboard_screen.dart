@@ -9,6 +9,7 @@ import 'domain/month_summary.dart';
 import '../movements/domain/finance_commands.dart';
 import '../movements/presentation/operation_screen.dart';
 import '../movements/presentation/operation_form.dart';
+import '../plans/presentation/plans_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -163,6 +164,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       });
 
   List<Widget> overview(DashboardSnapshot data, MonthSummary summary) => [
+        OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const PlansScreen())),
+            icon: const Icon(Icons.calendar_month),
+            label: const Text('Deudas y préstamos')),
         Text(data.profile.name,
             style: Theme.of(context).textTheme.headlineSmall),
         Text(data.profile.email),
@@ -437,8 +443,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     padding: const EdgeInsets.all(12),
                     child: Text(entry.value))))),
         const SizedBox(height: 24),
-        const Text(
-            'Finanzas Móvil · v0.3.0 (3)\nEtapa 2 · operaciones con confirmación'),
+        const Text('Finanzas Móvil · v0.4.0 (4)\nEtapa 3 · deudas y préstamos'),
       ];
 
   Widget content(DashboardSnapshot data) {

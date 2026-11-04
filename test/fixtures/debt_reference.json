@@ -1,0 +1,483 @@
+{
+  "source": "7a8380f999850900e4ed8cb5802cf92964bf16dd/src/finance.js",
+  "cases": [
+    {
+      "name": "zero",
+      "data": {
+        "acc": [],
+        "exp": [],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 5000,
+        "rate": 0,
+        "cuota": 1667,
+        "startM": "2026-11",
+        "mode": "fixed"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": true,
+        "rows": [
+          {
+            "m": "2026-11",
+            "amt": 1667
+          },
+          {
+            "m": "2026-12",
+            "amt": 1667
+          },
+          {
+            "m": "2027-01",
+            "amt": 1666
+          }
+        ],
+        "interest": 0
+      }
+    },
+    {
+      "name": "interest",
+      "data": {
+        "acc": [],
+        "exp": [],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 1000,
+        "rate": 2,
+        "cuota": 100,
+        "startM": "2026-11",
+        "mode": "fixed"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": true,
+        "rows": [
+          {
+            "m": "2026-11",
+            "amt": 100
+          },
+          {
+            "m": "2026-12",
+            "amt": 100
+          },
+          {
+            "m": "2027-01",
+            "amt": 100
+          },
+          {
+            "m": "2027-02",
+            "amt": 100
+          },
+          {
+            "m": "2027-03",
+            "amt": 100
+          },
+          {
+            "m": "2027-04",
+            "amt": 100
+          },
+          {
+            "m": "2027-05",
+            "amt": 100
+          },
+          {
+            "m": "2027-06",
+            "amt": 100
+          },
+          {
+            "m": "2027-07",
+            "amt": 100
+          },
+          {
+            "m": "2027-08",
+            "amt": 100
+          },
+          {
+            "m": "2027-09",
+            "amt": 100
+          },
+          {
+            "m": "2027-10",
+            "amt": 3
+          }
+        ],
+        "interest": 102.16533558192567
+      }
+    },
+    {
+      "name": "insufficient",
+      "data": {
+        "acc": [],
+        "exp": [],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 5000,
+        "rate": 10,
+        "cuota": 1,
+        "startM": "2026-11",
+        "mode": "fixed"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": false,
+        "rows": [],
+        "interest": 0
+      }
+    },
+    {
+      "name": "open",
+      "data": {
+        "acc": [],
+        "exp": [],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 0,
+        "rate": 0,
+        "cuota": 50,
+        "startM": "2026-11",
+        "mode": "open"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": true,
+        "rows": [
+          {
+            "m": "2026-11",
+            "amt": 50
+          },
+          {
+            "m": "2026-12",
+            "amt": 50
+          },
+          {
+            "m": "2027-01",
+            "amt": 50
+          },
+          {
+            "m": "2027-02",
+            "amt": 50
+          },
+          {
+            "m": "2027-03",
+            "amt": 50
+          },
+          {
+            "m": "2027-04",
+            "amt": 50
+          },
+          {
+            "m": "2027-05",
+            "amt": 50
+          },
+          {
+            "m": "2027-06",
+            "amt": 50
+          },
+          {
+            "m": "2027-07",
+            "amt": 50
+          },
+          {
+            "m": "2027-08",
+            "amt": 50
+          },
+          {
+            "m": "2027-09",
+            "amt": 50
+          },
+          {
+            "m": "2027-10",
+            "amt": 50
+          }
+        ],
+        "interest": 0
+      }
+    },
+    {
+      "name": "deferred-interest",
+      "data": {
+        "acc": [],
+        "exp": [],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 1000,
+        "rate": 2,
+        "cuota": 100,
+        "startM": "2026-11",
+        "mode": "fixed",
+        "resumeM": "2027-02"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": true,
+        "rows": [
+          {
+            "m": "2027-02",
+            "amt": 100
+          },
+          {
+            "m": "2027-03",
+            "amt": 100
+          },
+          {
+            "m": "2027-04",
+            "amt": 100
+          },
+          {
+            "m": "2027-05",
+            "amt": 100
+          },
+          {
+            "m": "2027-06",
+            "amt": 100
+          },
+          {
+            "m": "2027-07",
+            "amt": 100
+          },
+          {
+            "m": "2027-08",
+            "amt": 100
+          },
+          {
+            "m": "2027-09",
+            "amt": 100
+          },
+          {
+            "m": "2027-10",
+            "amt": 100
+          },
+          {
+            "m": "2027-11",
+            "amt": 100
+          },
+          {
+            "m": "2027-12",
+            "amt": 100
+          },
+          {
+            "m": "2028-01",
+            "amt": 79
+          }
+        ],
+        "interest": 178.2697902501456
+      }
+    },
+    {
+      "name": "fast",
+      "data": {
+        "acc": [],
+        "exp": [],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 5000,
+        "rate": 0,
+        "cuota": 1667,
+        "startM": "2026-11",
+        "mode": "fast"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": true,
+        "rows": [
+          {
+            "m": "2026-11",
+            "amt": 3500
+          },
+          {
+            "m": "2026-12",
+            "amt": 1500
+          }
+        ],
+        "interest": 0
+      }
+    },
+    {
+      "name": "paid",
+      "data": {
+        "acc": [],
+        "exp": [
+          {
+            "id": "e",
+            "debtId": "d",
+            "m": "2026-11",
+            "amt": 1667,
+            "paid": true
+          }
+        ],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 5000,
+        "rate": 0,
+        "cuota": 1667,
+        "startM": "2026-11",
+        "mode": "fixed"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": true,
+        "rows": [
+          {
+            "m": "2026-12",
+            "amt": 1667
+          },
+          {
+            "m": "2027-01",
+            "amt": 1666
+          }
+        ],
+        "interest": 0
+      }
+    },
+    {
+      "name": "past-start",
+      "data": {
+        "acc": [],
+        "exp": [],
+        "usd": 1000,
+        "rate": 4,
+        "inc": {},
+        "living": 500,
+        "cats": [],
+        "meths": [
+          "Transferencia"
+        ]
+      },
+      "debt": {
+        "id": "d",
+        "name": "Fixture",
+        "total": 5000,
+        "rate": 2,
+        "cuota": 1667,
+        "startM": "2026-09",
+        "mode": "fixed"
+      },
+      "now": "2026-11",
+      "expected": {
+        "ok": true,
+        "rows": [
+          {
+            "m": "2026-11",
+            "amt": 1667
+          },
+          {
+            "m": "2026-12",
+            "amt": 1667
+          },
+          {
+            "m": "2027-01",
+            "amt": 1667
+          },
+          {
+            "m": "2027-02",
+            "amt": 317
+          }
+        ],
+        "interest": 317.68348
+      }
+    }
+  ],
+  "formulas": [
+    {
+      "balance": 5000,
+      "rate": 0,
+      "months": 3,
+      "expected": 1667
+    },
+    {
+      "balance": 1000,
+      "rate": 2,
+      "months": 12,
+      "expected": 93
+    }
+  ],
+  "implied": [
+    {
+      "total": 1000,
+      "payment": 100,
+      "months": 12,
+      "expected": 3.503153036227682
+    },
+    {
+      "total": 1200,
+      "payment": 100,
+      "months": 12,
+      "expected": 8.436122825946547e-8
+    },
+    {
+      "total": 1500,
+      "payment": 100,
+      "months": 12,
+      "expected": null
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/backend_client.dart';
@@ -52,6 +53,49 @@ class _OperationScreenState extends ConsumerState<OperationScreen> {
         ? before
         : FinanceDocument.fromJson(draft.fields).summary.accounts;
     final changes = <Widget>[];
+    if (operation != null) {
+      const labels = {
+        'name': 'Nombre',
+        'person': 'Persona',
+        'total': 'Monto inicial COP',
+        'rate': 'Interés mensual %',
+        'cuota': 'Cuota COP',
+        'startM': 'Inicio',
+        'endM': 'Fin',
+        'resumeM': 'Reanuda',
+        'mode': 'Modalidad',
+        'lentOn': 'Prestado',
+        'dueOn': 'Vencimiento',
+        'on': 'Fecha',
+        'amt': 'Monto COP',
+        'note': 'Nota'
+      };
+      for (final key in ['debts', 'loans', 'loanPay']) {
+        final oldItems =
+            (widget.document.fields[key] as List? ?? []).cast<Map>();
+        final newItems = (draft.fields[key] as List? ?? []).cast<Map>();
+        for (final item in newItems) {
+          final old = oldItems.where((e) => e['id'] == item['id']);
+          if (old.isNotEmpty && jsonEncode(old.first) == jsonEncode(item)) {
+            continue;
+          }
+          changes.add(Text(
+              old.isEmpty ? 'Nuevo registro' : 'Actualizar registro',
+              style: const TextStyle(fontWeight: FontWeight.bold)));
+          for (final label in labels.entries) {
+            if (item[label.key] != null) {
+              changes.add(Text('${label.value}: ${item[label.key]}'));
+            }
+          }
+        }
+        for (final item in oldItems) {
+          if (!newItems.any((e) => e['id'] == item['id'])) {
+            changes.add(Text(
+                'Eliminar registro: ${item['name'] ?? item['person'] ?? item['on']}'));
+          }
+        }
+      }
+    }
     for (final account in after) {
       final old = before.where((a) => a.id == account.id);
       if (old.isEmpty || old.first.balance != account.balance) {
@@ -67,7 +111,9 @@ class _OperationScreenState extends ConsumerState<OperationScreen> {
           old.first['paid'] != row['paid'] ||
           old.first['m'] != row['m'] ||
           old.first['amt'] != row['amt'] ||
-          old.first['acc'] != row['acc']) {
+          old.first['acc'] != row['acc'] ||
+          old.first['debtId'] != row['debtId'] ||
+          old.first['investId'] != row['investId']) {
         changes.add(Text(
             '${row["name"]} · ${row["m"]} · ${cop(row["amt"] as num)} · ${row["paid"] == true ? "Pagado" : "Pendiente"}'));
         final linked = after.where((a) => a.id == row['acc']);
